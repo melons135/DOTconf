@@ -1,0 +1,181 @@
+.TH gtfoblookup.py "1" Manual
+.SH NAME
+gtfoblookup.py
+.SH SYNOPSIS
+.B gtfoblookup.py
+[-h] {update,purge,gtfobins,lolbas,wadcoms} ...
+.SH DESCRIPTION
+Offline command line lookup utility for GTFOBins
+(https://gtfobins.github.io/), LOLBAS(https://lolbas\-project.github.io/), and
+WADComs (https://wadcoms.github.io)
+.SH OPTIONS
+.SS
+\fBSub-commands\fR
+.TP
+\fBgtfoblookup.py\fR \fI\,update\/\fR
+update local copies of repositories
+.TP
+\fBgtfoblookup.py\fR \fI\,purge\/\fR
+remove local copies of repositories
+.TP
+\fBgtfoblookup.py\fR \fI\,gtfobins\/\fR
+search the local copy of GTFOBins
+.TP
+\fBgtfoblookup.py\fR \fI\,lolbas\/\fR
+search the local copy of LOLBAS
+.TP
+\fBgtfoblookup.py\fR \fI\,wadcoms\/\fR
+search the local copy of WADComs
+.SH OPTIONS 'gtfoblookup.py update'
+usage: gtfoblookup.py update [-h] [-r repo]
+
+
+.TP
+\fB\-r\fR repo, \fB\-\-repo\fR repo
+Only update the specified repository
+
+.SH OPTIONS 'gtfoblookup.py purge'
+usage: gtfoblookup.py purge [-h] [-r repo]
+
+
+.TP
+\fB\-r\fR repo, \fB\-\-repo\fR repo
+Only delete the specified repository
+
+.SH OPTIONS 'gtfoblookup.py gtfobins'
+usage: gtfoblookup.py gtfobins [-h] {list,search} ...
+
+.SS
+\fBSub-commands\fR
+.TP
+\fBgtfoblookup.py gtfobins\fR \fI\,list\/\fR
+list all types/categories/executables/prerequisites/services/attack types/OSs featured in the local copy of GTFOBins
+.TP
+\fBgtfoblookup.py gtfobins\fR \fI\,search\/\fR
+searchthe GTFOBins repository
+.SH OPTIONS 'gtfoblookup.py gtfobins list'
+usage: gtfoblookup.py gtfobins list [-h] attribute
+
+.TP
+\fBattribute\fR
+the attribute to list
+
+
+.SH OPTIONS 'gtfoblookup.py gtfobins search'
+usage: gtfoblookup.py gtfobins search [-h] [-c categories] [-f] executable
+
+.TP
+\fBexecutable\fR
+the executable to search for
+
+.TP
+\fB\-c\fR categories, \fB\-\-category\fR categories
+category or categories (comma separated) to search in
+
+.TP
+\fB\-f\fR, \fB\-\-file\fR
+use a file containing a list of executables (one per line) instead of a single
+executable
+
+
+.SH OPTIONS 'gtfoblookup.py lolbas'
+usage: gtfoblookup.py lolbas [-h] {list,search} ...
+
+.SS
+\fBSub-commands\fR
+.TP
+\fBgtfoblookup.py lolbas\fR \fI\,list\/\fR
+list all types/categories/executables/prerequisites/services/attack types/OSs featured in the local copy of LOLBAS
+.TP
+\fBgtfoblookup.py lolbas\fR \fI\,search\/\fR
+searchthe LOLBAS repository
+.SH OPTIONS 'gtfoblookup.py lolbas list'
+usage: gtfoblookup.py lolbas list [-h] attribute
+
+.TP
+\fBattribute\fR
+the attribute to list
+
+
+.SH OPTIONS 'gtfoblookup.py lolbas search'
+usage: gtfoblookup.py lolbas search [-h] [-c categories] [-t types] [-f]
+                                      executable
+
+.TP
+\fBexecutable\fR
+the executable to search for
+
+.TP
+\fB\-c\fR categories, \fB\-\-category\fR categories
+category or categories (comma separated) to search in
+
+.TP
+\fB\-t\fR types, \fB\-\-type\fR types
+type or types (comma separated)of executable to search for
+
+.TP
+\fB\-f\fR, \fB\-\-file\fR
+use a file containing a list of executables (one per line) instead of a single
+executable
+
+
+.SH OPTIONS 'gtfoblookup.py wadcoms'
+usage: gtfoblookup.py wadcoms [-h] {list,search} ...
+
+.SS
+\fBSub-commands\fR
+.TP
+\fBgtfoblookup.py wadcoms\fR \fI\,list\/\fR
+list all types/categories/executables/prerequisites/services/attack types/OSs featured in the local copy of WADComs
+.TP
+\fBgtfoblookup.py wadcoms\fR \fI\,search\/\fR
+searchthe WADComs repository
+.SH OPTIONS 'gtfoblookup.py wadcoms list'
+usage: gtfoblookup.py wadcoms list [-h] attribute
+
+.TP
+\fBattribute\fR
+the attribute to list
+
+
+.SH OPTIONS 'gtfoblookup.py wadcoms search'
+usage: gtfoblookup.py wadcoms search [-h] [-p prerequisites] [-s services]
+                                       [-a attack_types] [-o OSs] [-f]
+                                       executable
+
+.TP
+\fBexecutable\fR
+the executable to search for
+
+.TP
+\fB\-p\fR prerequisites, \fB\-\-prereq\fR prerequisites
+search for executables with a specific prerequisite or prerequisites (comma
+separated)
+
+.TP
+\fB\-s\fR services, \fB\-\-service\fR services
+search for executables that interract with aspecific service or services(comma
+separated)
+
+.TP
+\fB\-a\fR attack_types, \fB\-\-attacktype\fR attack_types
+search for executables that can be used for aspecific type or types (comma
+separated) of attacks
+
+.TP
+\fB\-o\fR OSs, \fB\-\-os\fR OSs
+search for executables that can be run on a specific operating system
+oroperating systems (comma separated)
+
+.TP
+\fB\-f\fR, \fB\-\-file\fR
+use a file containing a list of executables (one per line) instead of a single
+executable
+
+.SH AUTHORS
+.B GTFOBLookup
+was written by James Conlan <James.Conlan@nccgroup.com>.
+.SH DISTRIBUTION
+The latest version of GTFOBLookup may be downloaded from
+.UR https://github.com/nccgroup/GTFOBLookup
+.UE

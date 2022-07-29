@@ -1,0 +1,3 @@
+[submodule "Databases/GTFOBLookup"]
+	path = Databases/GTFOBLookup
+	url = https://github.com/nccgroup/GTFOBLookup.git
