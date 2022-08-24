@@ -20,7 +20,7 @@ programsArch=("reflector" "gnome" "xorg-xrandr" "feh" "cronie" "fd" "ripgrep-all
 Pentest=("metasploit" "ffuf" "enum4linux" "feroxbuster" "gobuster" "nbtscan" "nikto" "nmap" "onesixtyone" "smbclient" "smbmap" "whatweb" "wkhtmltopdf" "sqlmap" "crackmapexec" "evil-winrm" "chisel" "onesixtyone" "oscanner" "redis-tools" "snmpwalk" "svwar" "tnscmd10g" "amass" "hashcat" "john" "webshells" "bettercap")
 pipxPrograms=("git+https://github.com/calebstewart/pwncat.git" "git+https://github.com/Tib3rius/AutoRecon.git" "impacket" "git+https://github.com/cddmp/enum4linux-ng" "bloodhound" "git+https://github.com/dirkjanm/mitm6.git" "pypykatz")
 # Reversing tools
-Reversing=("strings" "ltrace" "strace" "flare-floss" "ghidra")
+Reversing=("ltrace" "strace" "ghidra" "strings" "binwalk")
 pipReversting=("oletools")
 # Networking tools
 NetworkingTools=("wireshark")
@@ -35,6 +35,7 @@ DOTfolder=$(find / -name DOTconf -type d 2> /dev/null | sed -n '1p')
 # - Conky install and config
 # - backup dconf settings rather than indavidual gsettings commands: https://www.addictivetips.com/ubuntu-linux-tips/back-up-the-gnome-shell-desktop-settings-linux/
 # - neofetch config and add to repo
+# - download flare-floss executable from https://github.com/mandiant/flare-floss/releases/tag/v2.0.0, put in /opt and link to /usr/bin or something
 
 ################################################# General Functions #################################################
 
