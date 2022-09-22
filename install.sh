@@ -17,8 +17,14 @@ set -o pipefail
 programsAll=("git" "zsh" "python3" "tmux" "guake" "obsidian" "parcellite" "python-pip" "python-venv" "python-pipx" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "nodejs" "tor" "zip" "neofetch")
 programsArch=("reflector" "gnome" "xorg-xrandr" "feh" "cronie" "fd" "ripgrep-all")
 # Pentest
+<<<<<<< HEAD
 Pentest=("metasploit" "ffuf" "enum4linux" "feroxbuster" "gobuster" "nbtscan" "nikto" "nmap" "onesixtyone" "smbclient" "smbmap" "whatweb" "wkhtmltopdf" "sqlmap" "crackmapexec" "evil-winrm" "chisel" "onesixtyone" "oscanner" "redis-tools" "snmpwalk" "svwar" "tnscmd10g" "amass" "hashcat" "john" "webshells" "bettercap")
 pipxPrograms=("git+https://github.com/calebstewart/pwncat.git" "git+https://github.com/Tib3rius/AutoRecon.git" "impacket" "git+https://github.com/cddmp/enum4linux-ng" "bloodhound" "git+https://github.com/dirkjanm/mitm6.git" "pypykatz" "tldr")
+=======
+Pentest=("metasploit" "ffuf" "enum4linux" "feroxbuster" "gobuster" "nbtscan" "nikto" "nmap" "onesixtyone" "smbclient" "smbmap" "whatweb" "wkhtmltopdf" "sqlmap" "crackmapexec" "evil-winrm" "chisel" "onesixtyone" "oscanner" "redis-tools" "snmpwalk" "svwar" "tnscmd10g" "amass" "hashcat" "john" "webshells" "bettercap" "exploitdb" "sliver")
+pipxPrograms=("git+https://github.com/calebstewart/pwncat.git" "git+https://github.com/Tib3rius/AutoRecon.git" "impacket" "git+https://github.com/cddmp/enum4linux-ng" "bloodhound" "git+https://github.com/dirkjanm/mitm6.git" "pypykatz")
+BrewTools=("nuclei" "httpx" "subfinder" "proxychains-ng" "navi" "rustscan")
+>>>>>>> f0d987d (wallpapers and install modifications)
 # Reversing tools
 Reversing=("ltrace" "strace" "ghidra" "strings" "binwalk")
 pipReversting=("oletools")
@@ -30,12 +36,12 @@ DOTfolder=$(find / -name DOTconf -type d 2> /dev/null | sed -n '1p')
 #ToDo:
 # - burp
 # - Gnome extension: check top gnome extesntions, probably system monitor, clipboard, IPs, desktops, dash to dock,  
-# - Themes: https://www.gnome-look.org/p/1305251 OR https://www.gnome-look.org/p/1316887
 # - ZSH Theme concept: https://github.com/ohmyzsh/ohmyzsh/wiki/Themes#jonathan & https://github.com/ohmyzsh/ohmyzsh/wiki/Themes#xiong-chiamiov-plus
 # - Conky install and config
 # - backup dconf settings rather than indavidual gsettings commands: https://www.addictivetips.com/ubuntu-linux-tips/back-up-the-gnome-shell-desktop-settings-linux/
 # - neofetch config and add to repo
 # - download flare-floss executable from https://github.com/mandiant/flare-floss/releases/tag/v2.0.0, put in /opt and link to /usr/bin or something
+# - add wallpapers to pictures and change xml file
 
 ################################################# General Functions #################################################
 
@@ -49,7 +55,7 @@ update(){
 	for f in ${!osInfo[@]}; do if [[ -f $f ]]; then eval ${osInfo[$f]} 1>/dev/null; fi; done
 }
 
-installer(){ # the input takes the neame of the variable rather than its values (i think it will requre more '@' signs around the varilable)
+installer(installmanager){ # the input takes the neame of the variable rather than its values (i think it will requre more '@' signs around the varilable)
 	progList=$@
         # eval "$manager ${progList[@]}"
 	for pkg in $progList
@@ -58,7 +64,7 @@ installer(){ # the input takes the neame of the variable rather than its values 
 			echo -e "$info  \033[31m*\033[0m[ $pkg is Already Installed ]\033[31m*\033[0m"
 		else
 			echo -ne "$warning  \033[31m*\033[0m[ $pkg is Not Installed (Attempting to Install..) ]\033[31m*\033[0m\n"
-			eval "$manager $pkg 1> /dev/null"
+			eval "$installmanager $pkg 1> /dev/null"
 			echo -ne "$success  \033[31m*\033[0m[ $pkg is Complete ]\033[31m*\033[0m\n"
 		fi
 	done
@@ -183,53 +189,58 @@ ConfigureGnome(){
 
 }
 
+# InstallWallpaper(){
+#         ## Dynamic Wallpaper : Set wallpapers according to current time.
+# 	## Created to work better with job schedulers (cron)
+# 	
+# 	## ANSI Colors (FG & BG)
+# 	RED="$(printf '\033[31m')"  GREEN="$(printf '\033[32m')"  ORANGE="$(printf '\033[33m')"  BLUE="$(printf '\033[34m')"
+# 	MAGENTA="$(printf '\033[35m')"  CYAN="$(printf '\033[36m')"  WHITE="$(printf '\033[37m')" BLACK="$(printf '\033[30m')"
+# 	REDBG="$(printf '\033[41m')"  GREENBG="$(printf '\033[42m')"  ORANGEBG="$(printf '\033[43m')"  BLUEBG="$(printf '\033[44m')"
+# 	MAGENTABG="$(printf '\033[45m')"  CYANBG="$(printf '\033[46m')"  WHITEBG="$(printf '\033[47m')" BLACKBG="$(printf '\033[40m')"
+# 	
+# 	# Path
+# 	DES="/usr/share"
+# 	
+# 	## Make dirs
+# 	mkdir_dw() {
+# 		echo -e ${ORANGE}"[*] Installing Dynamic Wallpaper..."${WHITE}
+# 		if [[ -d $DES/dynamic-wallpaper ]]; then
+# 			# delete old directory
+# 			sudo rm -rf $DES/dynamic-wallpaper
+# 			# create new directory
+# 			sudo mkdir -p $DES/dynamic-wallpaper
+# 		else
+# 			# create new directory
+# 			sudo mkdir -p $DES/dynamic-wallpaper
+# 		fi
+# 	}
+# 	
+# 	## Copy files
+# 	copy_files() {
+# 		# copy images and scripts
+# 		sudo cp -r $DOTfolder/Config/images $DES/dynamic-wallpaper && sudo cp -r $DOTfolder/Config/dwall.sh $DES/dynamic-wallpaper
+# 		# make script executable
+# 		sudo chmod +x $DES/dynamic-wallpaper/dwall.sh
+# 		# create link in bin directory
+# 		if [[ -L /usr/bin/dwall ]]; then
+# 			sudo rm /usr/bin/dwall
+# 			sudo ln -s $DES/dynamic-wallpaper/dwall.sh /usr/bin/dwall
+# 		else
+# 			sudo ln -s $DES/dynamic-wallpaper/dwall.sh /usr/bin/dwall
+# 		fi
+# 		echo -e ${GREEN}"[*] Installed Successfully. Execute 'dwall' to Run."${WHITE}
+# 	}
+# 	
+# 	## Install
+# 	mkdir_dw
+# 	copy_files
+# 	
+# }
+
 InstallWallpaper(){
-        ## Dynamic Wallpaper : Set wallpapers according to current time.
-	## Created to work better with job schedulers (cron)
-	
-	## ANSI Colors (FG & BG)
-	RED="$(printf '\033[31m')"  GREEN="$(printf '\033[32m')"  ORANGE="$(printf '\033[33m')"  BLUE="$(printf '\033[34m')"
-	MAGENTA="$(printf '\033[35m')"  CYAN="$(printf '\033[36m')"  WHITE="$(printf '\033[37m')" BLACK="$(printf '\033[30m')"
-	REDBG="$(printf '\033[41m')"  GREENBG="$(printf '\033[42m')"  ORANGEBG="$(printf '\033[43m')"  BLUEBG="$(printf '\033[44m')"
-	MAGENTABG="$(printf '\033[45m')"  CYANBG="$(printf '\033[46m')"  WHITEBG="$(printf '\033[47m')" BLACKBG="$(printf '\033[40m')"
-	
-	# Path
-	DES="/usr/share"
-	
-	## Make dirs
-	mkdir_dw() {
-		echo -e ${ORANGE}"[*] Installing Dynamic Wallpaper..."${WHITE}
-		if [[ -d $DES/dynamic-wallpaper ]]; then
-			# delete old directory
-			sudo rm -rf $DES/dynamic-wallpaper
-			# create new directory
-			sudo mkdir -p $DES/dynamic-wallpaper
-		else
-			# create new directory
-			sudo mkdir -p $DES/dynamic-wallpaper
-		fi
-	}
-	
-	## Copy files
-	copy_files() {
-		# copy images and scripts
-		sudo cp -r $DOTfolder/Config/images $DES/dynamic-wallpaper && sudo cp -r $DOTfolder/Config/dwall.sh $DES/dynamic-wallpaper
-		# make script executable
-		sudo chmod +x $DES/dynamic-wallpaper/dwall.sh
-		# create link in bin directory
-		if [[ -L /usr/bin/dwall ]]; then
-			sudo rm /usr/bin/dwall
-			sudo ln -s $DES/dynamic-wallpaper/dwall.sh /usr/bin/dwall
-		else
-			sudo ln -s $DES/dynamic-wallpaper/dwall.sh /usr/bin/dwall
-		fi
-		echo -e ${GREEN}"[*] Installed Successfully. Execute 'dwall' to Run."${WHITE}
-	}
-	
-	## Install
-	mkdir_dw
-	copy_files
-	
+  sudo cp -r $DOTfolder/Wallpapers/* /usr/share/backgrounds/
+  sudo mv $DOTfolder/Wallpapers/**/*.xml /usr/share/backgrounds/gnome/
 }
 
 vimModules(){
@@ -307,6 +318,16 @@ optTools(){ #works
 
         #kerbrute
         sudo curl -sL --create-dirs -o /opt/kerbrute_linux_amd64 https://github.com/ropnop/kerbrute/releases/download/v1.0.3/kerbrute_linux_amd64 && sudo ln -s /opt/kerbrute /usr/local/bin/kerbrute 
+
+        #Sliver
+	if [[ -z `command -v sliver` ]]; then sudo git clone https://github.com/BishopFox/sliver.git /opt && cd /opt/sliver && curl https://sliver.sh/install|sudo bash fi
+
+        # Navi install
+        sudo curl -sL --create-dirs -o /opt/navi/navi-linux.tar.gz https://github.com/denisidoro/navi/releases/download/v2.20.1/navi-v2.20.1-aarch64-unknown-linux-gnu.tar.gz && cd /opt/navi && tar xzf navi-linux.tar.gz && sudo ln -s navi /usr/local/bin/navi
+
+        # nucli Templates
+        sudo git clone https://github.com/projectdiscovery/nuclei-templates.git /opt/nuclei-templates
+
 }
 
 LocalGTFO(){
@@ -320,21 +341,31 @@ FirefoxPentestPlugins(){
 	firefox https://addons.mozilla.org/en-US/firefox/addon/foxyproxy-standard/ https://addons.mozilla.org/en-US/firefox/addon/firebug/ https://addons.mozilla.org/en-US/firefox/addon/user-agent-switcher/ https://addons.mozilla.org/en-US/firefox/addon/live-http-headers/ https://addons.mozilla.org/en-GB/firefox/addon/hacktools/
 }
 
-seclistInstall(){
-}
-
 ################################################ Tool Collection Installs ################################################ 
 
-WebAppTesting(){
-	#Install go
-	installer go || installer go-lang
-        wait $?
-	#Install web testing tools
-	go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
-	go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
-	go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-	#templates for web testing tools
-	sudo git clone https://github.com/projectdiscovery/nuclei-templates.git /opt/nuclei-templates
+# GoTools(){
+# 	#Install go
+# 	installer go || installer go-lang
+#         wait $?
+# 	#Install web testing tools
+# 	go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
+# 	go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
+# 	go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+# 	#templates for web testing tools
+# }
+
+# RustTools(){
+#   installer cargo
+#   wait $?
+#   # install go tools
+#   cargo install rustscan
+#   installer fzf
+#   cargo install --locked navi
+#
+#
+# }
+BrewTools(){
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
 
 installPentestTools(){
@@ -348,17 +379,15 @@ installPentestTools(){
 		continue
 	fi
 	wait $?
-	WebAppTesting
+	installer ${Pentest[*]}
 	wait $?
 	optTools
         wait $?
-        [ ! -d "/usr/share/seclist" ] && installer seclists
-	wait $?
-	installer ${Pentest[*]}
+        [ ! -d "/usr/share/seclist" ] && installer($manager) seclists
         wait $?
         curl -sSL https://bootstrap.pypa.io/get-pip.py | python3
         wait $?
-        python3 -m pip install --user pipx && python3 -m pipx ensurepath
+        python3 -m pip install --user pipx
 	wait $?
 	for i in ${pipxPrograms[*]}; do eval "pipx install $i"; done
 	wait $?
@@ -368,7 +397,7 @@ installPentestTools(){
 }
 
 installBasic(){
-	installer ${programsAll[*]}
+  installer($manager) ${programsAll[*]}
 	wait $?
 	zsh
 	wait $?
