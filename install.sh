@@ -16,7 +16,7 @@ set -x pipefail
 
 ################################################# Variables #################################################
 
-programsAll=("git" "zsh" "python3" "tmux" "guake" "obsidian" "parcellite" "python-pip" "python-venv" "python-pipx" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "nodejs" "tor" "zip" "neofetch")
+programsAll=("git" "zsh" "python3" "tmux" "guake" "obsidian" "parcellite" "python-pip" "python-venv" "python-pipx" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "nodejs" "tor" "zip" "neofetch" @dconf@)
 programsArch=("reflector" "gnome" "xorg-xrandr" "feh" "cronie" "fd" "ripgrep-all")
 # Pentest
 Pentest=("metasploit" "ffuf" "enum4linux" "feroxbuster" "gobuster" "nbtscan" "nikto" "nmap" "onesixtyone" "smbclient" "smbmap" "whatweb" "wkhtmltopdf" "sqlmap" "crackmapexec" "evil-winrm" "chisel" "onesixtyone" "oscanner" "redis-tools" "snmpwalk" "svwar" "tnscmd10g" "amass" "hashcat" "john" "webshells" "bettercap" "exploitdb" "sliver")
@@ -53,7 +53,6 @@ update(){
 }
 
 installer(){ # the input takes the neame of the variable rather than its values (i think it will requre more '@' signs around the varilable)
-	installmanager=$1
 	progList=$@
         # eval "$manager ${progList[@]}"
 	for pkg in $progList
@@ -117,7 +116,7 @@ configureArch(){
         update
 }
 
-tmux(){
+Installtmux(){
 	#copy .tmux.conf to home directory
 	if [[ -a ~/.tmux.conf ]]
 	then
@@ -133,17 +132,21 @@ tmux(){
 	fi
 }
 
-zsh(){
+Installzsh(){
 	if [[ -a $HOME/.zshrc ]]
 	then
 		mv $HOME/.zshrc $HOME/.zshrc.bak
-		ln -s $PWD/.zshrc $HOME/
+		ln -s $DOTfolder/.zshrc $HOME/
 	else
-		ln -s $PWD/.zshrc $HOME/
+		ln -s $DOTfolder/.zshrc $HOME/
 	fi
 	source $HOME/.zshrc
 	# install ohmyzsh
-	sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+	if command -v zsh >/dev/null 2>&1; then
+		sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+	else
+		installer zsh
+		sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 	wait $?
 
 	# install extra plugins
@@ -159,31 +162,33 @@ ConfigureGnome(){
   installer gnome-extensions
   wait $?
 
-  # night mode on
-  gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
- # Automatic night light schedule
-  gsettings set org.gnome.settings-daemon.plugins.color night-light-schedule-automatic true
-  #set dark theme
-  gsettings set org.gnome.desktop.interface color-scheme prefer-dark | gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
-
-  # Disable all gnome extensions
-  for ext in $(/usr/bin/ls ~/.local/share/gnome-shell/extensions); do 
-    gnome-extensions disable $ext
-  done
-
-  #enable required extensions
-  gnome-extensions enable apps-menu@gnome-shell-extensions.gcampax.github.com
-
   # icon theme
   sudo mkdir -p /usr/share/icons/
   git clone https://github.com/EliverLara/candy-icons.git /usr/share/icons/candy-icons
   gsettings set org.gnome.desktop.interface icon-theme candy-icons
   
+  #load backup
+  dconf load / < $DOTfolder/dconf-backup
+  
+  # night mode on
+  #gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
+ # Automatic night light schedule
+  #gsettings set org.gnome.settings-daemon.plugins.color night-light-schedule-automatic true
+  #set dark theme
+  #gsettings set org.gnome.desktop.interface color-scheme prefer-dark | gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+
+  # Disable all gnome extensions
+  #for ext in $(/usr/bin/ls ~/.local/share/gnome-shell/extensions); do 
+  #  gnome-extensions disable $ext
+  #done
+
+  #enable required extensions
+  #gnome-extensions enable apps-menu@gnome-shell-extensions.gcampax.github.com
   # dash-to-dock config
-  wait $?
-  gsettings set org.gnome.shell.extensions.dash-to-dock intellihide true
-  gsettings set org.gnome.shell.extensions.dash-to-dock autohide true
-  gsettings set org.gnome.shell.extensions.dash-to-dock autohide-in-fullscreen true
+  #wait $?
+  #gsettings set org.gnome.shell.extensions.dash-to-dock intellihide true
+  #gsettings set org.gnome.shell.extensions.dash-to-dock autohide true
+  #gsettings set org.gnome.shell.extensions.dash-to-dock autohide-in-fullscreen true
 
 }
 
@@ -196,24 +201,6 @@ ConfigureNavi(){
 InstallWallpaper(){
   sudo cp -r $DOTfolder/Wallpapers/* /usr/share/backgrounds/
   sudo mv $DOTfolder/Wallpapers/**/*.xml /usr/share/backgrounds/gnome/
-}
-
-vimModules(){
-	installer vim
-
-	#install vimplug
-	curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-	# configure vimrc
-	ln -s $DOTfolder/.vimrc $HOME
-
-	# add vim modules
-	if [[ ! $HOME/.vim/pack/plugins/start ]] ; then mk -p $HOME/.vim/pack/vendor/start; fi
-	ln -s $HOME/GitDocs/Vim\ Modules/* $HOME/.vim/pack/vendor/start
-
-	# COC install
-	vim -c "helptags $HOME/.vim/pack/vendor/start/coc.nvim/doc/ | q"
-	vim -c "CocInstall -sync coc-sh coc-pyright"
 }
 
 Neovim(){
@@ -335,15 +322,15 @@ installPentestTools(){
 }
 
 installBasic(){
-  installer ${programsAll[*]}
+	installer ${programsAll[*]}
 	wait $?
-	zsh
+	Installzsh
 	wait $?
-	tmux
+	Installtmux
 	wait $?
 	Neovim
 	wait $?
-        InstallWallpaper
+    InstallWallpaper
 	wait $?
 	if [[ -f /etc/arch-release ]]; then configureArch; fi
 	wait $?
@@ -375,3 +362,5 @@ Configure(){
 } 
 
 Configure
+
+ 
