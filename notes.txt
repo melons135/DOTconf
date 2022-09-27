@@ -1,0 +1,11 @@
+
+# pull all git repos
+find / -name .git -type f 2>/dev/null | sed 's/\/.git//g'	# list all directories with .git files
+find / -name .git -type d 2>/dev/null | sed 's/\/.git//g'	# list all directories with .git files
+
+gitdirs=$(find / -name .git -type d 2>/dev/null ; find / -name .git -type f 2>/dev/null)
+for each $($gitdirs | sed 's/\/.git//g'):
+	git -C "<directory>" pull	# pull the directory
+
+# all of the above commands can be combined below
+sed 's/\/.git//g' <(find / -name .git -type d 2>/dev/null) <(find / -name .git -type f 2>/dev/null)
