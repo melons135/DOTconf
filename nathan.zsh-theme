@@ -28,10 +28,9 @@ function prompt_command {
 
         tty=$(tty | awk -F'/' {'print $(NF-1)"/"$NF'})
 	newPWD="${PWD}"
-	power=$(apm | sed -e "s/.*: \([1-9][0-9]*\)%/\1/" | tr -d " ")
+	# (deleter) power=$(apm | sed -e "s/.*: \([1-9][0-9]*\)%/\1/" | tr -d " ")
 	#   Add all the accessories below ...
-	let promptsize=$(echo -n "$ULCORNER──($DEETS)-{$PROMPTINTEFACE$PROMPTIP}--[$newPWD] $tty $URCORNER"
-	                 | wc -c | tr -d " ")
+	let promptsize=$(echo -n "$ULCORNER──($DEETS)-{$PROMPTINTEFACE$PROMPTIP}--[$newPWD] $tty $URCORNER" | wc -c | tr -d " ")
 	let fillsize=${TERMWIDTH}-${promptsize}
 	fill=""
 	while [ "$fillsize" -gt "0" ] 

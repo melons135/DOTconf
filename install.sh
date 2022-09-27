@@ -10,21 +10,16 @@ usage(){
         echo "Specifically Ubuntu and Arch"
 }
 
-set -o pipefail
+set -exo pipefail
 
 ################################################# Variables #################################################
 
 programsAll=("git" "zsh" "python3" "tmux" "guake" "obsidian" "parcellite" "python-pip" "python-venv" "python-pipx" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "nodejs" "tor" "zip" "neofetch")
 programsArch=("reflector" "gnome" "xorg-xrandr" "feh" "cronie" "fd" "ripgrep-all")
 # Pentest
-<<<<<<< HEAD
-Pentest=("metasploit" "ffuf" "enum4linux" "feroxbuster" "gobuster" "nbtscan" "nikto" "nmap" "onesixtyone" "smbclient" "smbmap" "whatweb" "wkhtmltopdf" "sqlmap" "crackmapexec" "evil-winrm" "chisel" "onesixtyone" "oscanner" "redis-tools" "snmpwalk" "svwar" "tnscmd10g" "amass" "hashcat" "john" "webshells" "bettercap")
-pipxPrograms=("git+https://github.com/calebstewart/pwncat.git" "git+https://github.com/Tib3rius/AutoRecon.git" "impacket" "git+https://github.com/cddmp/enum4linux-ng" "bloodhound" "git+https://github.com/dirkjanm/mitm6.git" "pypykatz" "tldr")
-=======
 Pentest=("metasploit" "ffuf" "enum4linux" "feroxbuster" "gobuster" "nbtscan" "nikto" "nmap" "onesixtyone" "smbclient" "smbmap" "whatweb" "wkhtmltopdf" "sqlmap" "crackmapexec" "evil-winrm" "chisel" "onesixtyone" "oscanner" "redis-tools" "snmpwalk" "svwar" "tnscmd10g" "amass" "hashcat" "john" "webshells" "bettercap" "exploitdb" "sliver")
-pipxPrograms=("git+https://github.com/calebstewart/pwncat.git" "git+https://github.com/Tib3rius/AutoRecon.git" "impacket" "git+https://github.com/cddmp/enum4linux-ng" "bloodhound" "git+https://github.com/dirkjanm/mitm6.git" "pypykatz")
-BrewTools=("nuclei" "httpx" "subfinder" "proxychains-ng" "navi" "rustscan")
->>>>>>> f0d987d (wallpapers and install modifications)
+pipxPrograms=("git+https://github.com/calebstewart/pwncat.git" "git+https://github.com/Tib3rius/AutoRecon.git" "impacket" "git+https://github.com/cddmp/enum4linux-ng" "bloodhound" "git+https://github.com/dirkjanm/mitm6.git" "pypykatz" "howdoi")
+BrewTools=("nuclei" "httpx" "subfinder" "proxychains-ng" "navi" "rustscan" "nim")
 # Reversing tools
 Reversing=("ltrace" "strace" "ghidra" "strings" "binwalk")
 pipReversting=("oletools")
@@ -111,7 +106,7 @@ blackArchInstall(){
 ################################################ Configurations ################################################
 
 configureArch(){
-	installer programsArch
+  installer($manager) programsArch
 
 	# reflector
 	sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
@@ -189,6 +184,12 @@ ConfigureGnome(){
 
 }
 
+ConfigureNavi(){
+  navi repo add https://github.com/denisidoro/cheats
+  navi repo add https://github.com/denisidoro/navi-tldr-pages
+  navi repo add https://github.com/melons135/Melons.cheat
+
+}
 # InstallWallpaper(){
 #         ## Dynamic Wallpaper : Set wallpapers according to current time.
 # 	## Created to work better with job schedulers (cron)
@@ -264,8 +265,11 @@ vimModules(){
 Neovim(){
 	installer neovim noto-fonts{,-extra,-emoji}
 	
-        # config add
-        git clone https://github.com/NvChad/NvChad.git ~/.config/nvim
+  # config add
+  git clone https://github.com/NvChad/NvChad.git ~/.config/nvim
+  nvim +'hi NormalFloat guibg=#1e222a' +PackerSync
+  # Install
+  nvim -c "MasonInstall nimlsp"
 }
 
 ################################################# Misc. Tools #################################################
@@ -322,9 +326,6 @@ optTools(){ #works
         #Sliver
 	if [[ -z `command -v sliver` ]]; then sudo git clone https://github.com/BishopFox/sliver.git /opt && cd /opt/sliver && curl https://sliver.sh/install|sudo bash fi
 
-        # Navi install
-        sudo curl -sL --create-dirs -o /opt/navi/navi-linux.tar.gz https://github.com/denisidoro/navi/releases/download/v2.20.1/navi-v2.20.1-aarch64-unknown-linux-gnu.tar.gz && cd /opt/navi && tar xzf navi-linux.tar.gz && sudo ln -s navi /usr/local/bin/navi
-
         # nucli Templates
         sudo git clone https://github.com/projectdiscovery/nuclei-templates.git /opt/nuclei-templates
 
@@ -364,7 +365,7 @@ FirefoxPentestPlugins(){
 #
 #
 # }
-BrewTools(){
+BrewInstall(){
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
 
@@ -379,7 +380,7 @@ installPentestTools(){
 		continue
 	fi
 	wait $?
-	installer ${Pentest[*]}
+        installer($manager) ${Pentest[*]}
 	wait $?
 	optTools
         wait $?
@@ -390,6 +391,10 @@ installPentestTools(){
         python3 -m pip install --user pipx
 	wait $?
 	for i in ${pipxPrograms[*]}; do eval "pipx install $i"; done
+        wait $?
+        BrewInstall
+        wait $?
+        isntaller("brew") ${BrewTools[*]}
 	wait $?
 	LocalGTFO
 	wait $?
