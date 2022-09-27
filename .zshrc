@@ -79,7 +79,7 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
-# export MANPATH="/usr/local/man:$MANPATH"
+export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
@@ -92,6 +92,9 @@ else
 fi
 
 if [[ neofetch ]]; then neofetch; fi
+
+export MYIP=$(ip addr show tun0 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' --color=none)
+
 
 ## Aliases
 
@@ -116,7 +119,7 @@ alias clip='xclip -selection clipboard'
 
 #to work with tar.gz files
 alias untar="tar -xvf $@"
-alias veiwtar="tar -tvf $@"
+alias viewtar="tar -tvf $@"
 
 #get external ip
 alias externalip='curl https://api.ipify.org/'
@@ -139,12 +142,26 @@ alias dockerit='sudo docker run -it --rm -v $PWD/$2:/ --entrypoint=/bin/bash $2'
 #torify proxy
 alias hide='if [ `systemctl is-active` = 'inactive'] ; do systemctl start tor ;fi ; source torsocks on'
 alias unhide='source torsocks off'
+# or
+# alias hide='source torsocks on'
+# alias unhide='source torsocks off'
 
 #network help
 alias listening='ss -nlt'
 
 #colour commands
 alias ip="ip -c"
+
+# docker here
+alias dockerit='sudo docker run -it --rm -v $PWD/$2:/ $2'
+
+# Bloodhound
+alias bloodhound='xhost + && sudo docker run -it --rm -v /tmp/.X11-unix/:/tmp/.X11-unix -e DISPLAY=$DISPLAY --network host --name bloodhound bannsec/bloodhound'
+
+alias script_tty_upgrade="echo '/usr/bin/script -qc /bin/bash /dev/null'| xclip -sel clip"
+alias tty_fix="stty raw -echo; fg; reset"
+alias tty_conf="stty -a | sed 's/;//g' | head -n 1 | sed 's/.*baud /stty /g;s/line.*//g' | xclip -sel clip"
+
 
 ## Functions
 
@@ -181,8 +198,18 @@ function scan(){
 
 #backup file
 function backup(){
-	sudo cp $(realpath $1) $(realpath $1).bak
+  sudo cp $(realpath $1){,.bak}
 }
+
+Update(){
+  bash -c 'declare -A osInfo=([/etc/redhat-release]="sudo yum update -y" [/etc/arch-release]="sudo pacman -Syu" [/etc/debian_version]="sudo apt update && sudo apt upgrade -y" [/etc/alpine-release]="sudo apk update -y") && for f in ${!osInfo[@]}; do if [[ -f $f ]]; then eval ${osInfo[$f]}; fi; done'
+}
+
+py3_tty_upgrade () {
+   echo "python3 -c 'import pty;pty.spawn(\"/bin/bash\")'"| xclip -sel clip
+}
+
+
 
 #GTFOBlookup scripts
 # from https://github.com/nccgroup/GTFOBLookup
