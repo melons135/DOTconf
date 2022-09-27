@@ -16,7 +16,7 @@ set -x pipefail
 
 ################################################# Variables #################################################
 
-programsAll=("git" "zsh" "python3" "tmux" "guake" "obsidian" "parcellite" "python-pip" "python-venv" "python-pipx" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "nodejs" "tor" "zip" "neofetch" @dconf@)
+programsAll=("git" "zsh" "python3" "tmux" "guake" "obsidian" "parcellite" "python-pip" "python-venv" "python-pipx" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "tor" "zip" "neofetch" "dconf")
 programsArch=("reflector" "gnome" "xorg-xrandr" "feh" "cronie" "fd" "ripgrep-all")
 # Pentest
 Pentest=("metasploit" "ffuf" "enum4linux" "feroxbuster" "gobuster" "nbtscan" "nikto" "nmap" "onesixtyone" "smbclient" "smbmap" "whatweb" "wkhtmltopdf" "sqlmap" "crackmapexec" "evil-winrm" "chisel" "onesixtyone" "oscanner" "redis-tools" "snmpwalk" "svwar" "tnscmd10g" "amass" "hashcat" "john" "webshells" "bettercap" "exploitdb" "sliver")
@@ -35,10 +35,8 @@ DOTfolder=$(find / -name DOTconf -type d 2> /dev/null | sed -n '1p')
 # - Gnome extension: check top gnome extesntions, probably system monitor, clipboard, IPs, desktops, dash to dock,  
 # - ZSH Theme concept: https://github.com/ohmyzsh/ohmyzsh/wiki/Themes#jonathan & https://github.com/ohmyzsh/ohmyzsh/wiki/Themes#xiong-chiamiov-plus
 # - Conky install and config
-# - backup dconf settings rather than indavidual gsettings commands: https://www.addictivetips.com/ubuntu-linux-tips/back-up-the-gnome-shell-desktop-settings-linux/
 # - neofetch config and add to repo
 # - download flare-floss executable from https://github.com/mandiant/flare-floss/releases/tag/v2.0.0, put in /opt and link to /usr/bin or something
-# - add wallpapers to pictures and change xml file
 
 ################################################# General Functions #################################################
 
@@ -68,9 +66,9 @@ installer(){ # the input takes the neame of the variable rather than its values 
 }
 
 header(){
-	echo "\n============================================================\n"
-	echo "[+] $@\n"
-	echo "============================================================\n\n"
+	echo -en "\n============================================================\n"
+	echo -en "$success[+] $info$@\n"
+	echo -en "============================================================\n\n"
 }
 
 ################################################# Repos ################################################
@@ -96,7 +94,6 @@ blackArchInstall(){
 
 	# Run strap.sh
 	sudo ./strap.sh
-	wait $!
 
 	# remove strap and hash file
 	rm strap{.sh,}
@@ -141,12 +138,12 @@ Installzsh(){
 		ln -s $DOTfolder/.zshrc $HOME/
 	fi
 	
-	# install ohmyzsh
+	# install ohmyzsh (Install errors out and stops here)
 	if command -v zsh >/dev/null 2>&1; then
-		sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+		yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 	else
 		installer zsh
-		sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+		yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 	fi
 
 	# install extra plugins
@@ -160,7 +157,7 @@ Installzsh(){
 
 ConfigureGnome(){
   installer gnome-extensions
-  wait $?
+  
 
   # icon theme
   sudo mkdir -p /usr/share/icons/
@@ -185,7 +182,7 @@ ConfigureGnome(){
   #enable required extensions
   #gnome-extensions enable apps-menu@gnome-shell-extensions.gcampax.github.com
   # dash-to-dock config
-  #wait $?
+  #
   #gsettings set org.gnome.shell.extensions.dash-to-dock intellihide true
   #gsettings set org.gnome.shell.extensions.dash-to-dock autohide true
   #gsettings set org.gnome.shell.extensions.dash-to-dock autohide-in-fullscreen true
@@ -298,42 +295,42 @@ installPentestTools(){
 	else
 		continue
 	fi
-	wait $?
+	
         installer ${Pentest[*]}
-	wait $?
+	
 	optTools
-        wait $?
+        
         [ ! -d "/usr/share/seclist" ] && installer seclists
-        wait $?
+        
         curl -sSL https://bootstrap.pypa.io/get-pip.py | python3
-        wait $?
+        
         python3 -m pip install --user pipx
-	wait $?
+	
 	for i in ${pipxPrograms[*]}; do eval "pipx install $i"; done
-        wait $?
+        
         BrewInstall
-        wait $?
+        
 				local manager=brew
         installer ${BrewTools[*]}
-	wait $?
+	
 	LocalGTFO
-	wait $?
+	
 	FirefoxPentestPlugins
 }
 
 installBasic(){
 	installer ${programsAll[*]}
-	wait $?
-	Installzsh
-	wait $?
+	
+	Installzsh # install fails in this function
+	
 	Installtmux
-	wait $?
+	
 	Neovim
-	wait $?
+	
     InstallWallpaper
-	wait $?
+	
 	if [[ -f /etc/arch-release ]]; then configureArch; fi
-	wait $?
+	
 }
 
 Configure(){
