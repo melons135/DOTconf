@@ -48,8 +48,8 @@ for f in ${!osInfo[@]}; do if [[ -f $f ]]; then manager=${osInfo[$f]} && break; 
 # }
 
 update(){
-	declare -A osInfo=([/etc/redhat-release]='sudo yum update -y' [/etc/arch-release]='sudo pacman -Syu' [/etc/debian_version]='sudo apt update && sudo apt upgrade' [/etc/alpine-release]='sudo apk update -y')
-	for f in ${!osInfo[@]}; do if [[ -f $f ]]; then eval ${osInfo[$f]} 1>/dev/null; fi; done
+	declare -A osInfo=([/etc/redhat-release]='sudo yum update -y' [/etc/arch-release]='sudo pacman -Syu' [/etc/debian_version]='sudo apt update && sudo apt upgrade -y' [/etc/alpine-release]='sudo apk update -y')
+	for f in ${!osInfo[@]}; do if [[ -f $f ]]; then header "Updating" && eval ${osInfo[$f]} 1>/dev/null; fi; done
 }
 
 installer(){ # the input takes the neame of the variable rather than its values (i think it will requre more '@' signs around the varilable)
@@ -140,14 +140,14 @@ Installzsh(){
 	else
 		ln -s $DOTfolder/.zshrc $HOME/
 	fi
-	source $HOME/.zshrc
+	
 	# install ohmyzsh
 	if command -v zsh >/dev/null 2>&1; then
 		sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 	else
 		installer zsh
 		sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-	wait $?
+	fi
 
 	# install extra plugins
     mkdir -p $HOME/.oh-my-zsh/plugins/
@@ -362,5 +362,3 @@ Configure(){
 } 
 
 Configure
-
- 
