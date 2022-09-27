@@ -1,4 +1,6 @@
-#!/bin/bash#---------------
+#!/bin/bash
+
+#---------------
 warning="[- \033[31mWARNING\033[0m -]"
 info="[- \033[1;33minfo\033[0m -]"
 failure="[- \033[31mFAILED\033[0m -]"
@@ -10,7 +12,7 @@ usage(){
         echo "Specifically Ubuntu and Arch"
 }
 
-set -exo pipefail
+set -x pipefail
 
 ################################################# Variables #################################################
 
@@ -50,7 +52,8 @@ update(){
 	for f in ${!osInfo[@]}; do if [[ -f $f ]]; then eval ${osInfo[$f]} 1>/dev/null; fi; done
 }
 
-installer(installmanager){ # the input takes the neame of the variable rather than its values (i think it will requre more '@' signs around the varilable)
+installer(){ # the input takes the neame of the variable rather than its values (i think it will requre more '@' signs around the varilable)
+	installmanager=$1
 	progList=$@
         # eval "$manager ${progList[@]}"
 	for pkg in $progList
@@ -59,7 +62,7 @@ installer(installmanager){ # the input takes the neame of the variable rather th
 			echo -e "$info  \033[31m*\033[0m[ $pkg is Already Installed ]\033[31m*\033[0m"
 		else
 			echo -ne "$warning  \033[31m*\033[0m[ $pkg is Not Installed (Attempting to Install..) ]\033[31m*\033[0m\n"
-			eval "$installmanager $pkg 1> /dev/null"
+			eval "$manager $pkg 1> /dev/null"
 			echo -ne "$success  \033[31m*\033[0m[ $pkg is Complete ]\033[31m*\033[0m\n"
 		fi
 	done
@@ -106,7 +109,7 @@ blackArchInstall(){
 ################################################ Configurations ################################################
 
 configureArch(){
-  installer($manager) programsArch
+  installer ${programsArch[*]}
 
 	# reflector
 	sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
@@ -144,7 +147,7 @@ zsh(){
 	wait $?
 
 	# install extra plugins
-        mkdir -p $HOME/.oh-my-zsh/plugins/
+    mkdir -p $HOME/.oh-my-zsh/plugins/
 	git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 	git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
 	
@@ -188,56 +191,7 @@ ConfigureNavi(){
   navi repo add https://github.com/denisidoro/cheats
   navi repo add https://github.com/denisidoro/navi-tldr-pages
   navi repo add https://github.com/melons135/Melons.cheat
-
 }
-# InstallWallpaper(){
-#         ## Dynamic Wallpaper : Set wallpapers according to current time.
-# 	## Created to work better with job schedulers (cron)
-# 	
-# 	## ANSI Colors (FG & BG)
-# 	RED="$(printf '\033[31m')"  GREEN="$(printf '\033[32m')"  ORANGE="$(printf '\033[33m')"  BLUE="$(printf '\033[34m')"
-# 	MAGENTA="$(printf '\033[35m')"  CYAN="$(printf '\033[36m')"  WHITE="$(printf '\033[37m')" BLACK="$(printf '\033[30m')"
-# 	REDBG="$(printf '\033[41m')"  GREENBG="$(printf '\033[42m')"  ORANGEBG="$(printf '\033[43m')"  BLUEBG="$(printf '\033[44m')"
-# 	MAGENTABG="$(printf '\033[45m')"  CYANBG="$(printf '\033[46m')"  WHITEBG="$(printf '\033[47m')" BLACKBG="$(printf '\033[40m')"
-# 	
-# 	# Path
-# 	DES="/usr/share"
-# 	
-# 	## Make dirs
-# 	mkdir_dw() {
-# 		echo -e ${ORANGE}"[*] Installing Dynamic Wallpaper..."${WHITE}
-# 		if [[ -d $DES/dynamic-wallpaper ]]; then
-# 			# delete old directory
-# 			sudo rm -rf $DES/dynamic-wallpaper
-# 			# create new directory
-# 			sudo mkdir -p $DES/dynamic-wallpaper
-# 		else
-# 			# create new directory
-# 			sudo mkdir -p $DES/dynamic-wallpaper
-# 		fi
-# 	}
-# 	
-# 	## Copy files
-# 	copy_files() {
-# 		# copy images and scripts
-# 		sudo cp -r $DOTfolder/Config/images $DES/dynamic-wallpaper && sudo cp -r $DOTfolder/Config/dwall.sh $DES/dynamic-wallpaper
-# 		# make script executable
-# 		sudo chmod +x $DES/dynamic-wallpaper/dwall.sh
-# 		# create link in bin directory
-# 		if [[ -L /usr/bin/dwall ]]; then
-# 			sudo rm /usr/bin/dwall
-# 			sudo ln -s $DES/dynamic-wallpaper/dwall.sh /usr/bin/dwall
-# 		else
-# 			sudo ln -s $DES/dynamic-wallpaper/dwall.sh /usr/bin/dwall
-# 		fi
-# 		echo -e ${GREEN}"[*] Installed Successfully. Execute 'dwall' to Run."${WHITE}
-# 	}
-# 	
-# 	## Install
-# 	mkdir_dw
-# 	copy_files
-# 	
-# }
 
 InstallWallpaper(){
   sudo cp -r $DOTfolder/Wallpapers/* /usr/share/backgrounds/
@@ -265,16 +219,13 @@ vimModules(){
 Neovim(){
 	installer neovim noto-fonts{,-extra,-emoji}
 	
-  # config add
-  git clone https://github.com/NvChad/NvChad.git ~/.config/nvim
-  nvim +'hi NormalFloat guibg=#1e222a' +PackerSync
-  # Install
-  nvim -c "MasonInstall nimlsp"
+	# install space vim
+	curl -sLf https://spacevim.org/install.sh | bash
 }
 
 ################################################# Misc. Tools #################################################
 
-optTools(){ #works
+optTools(){
 	# pspy
 	sudo curl -sL --create-dirs -o /opt/pspy/pspy32 https://github.com/DominicBreuker/pspy/releases/download/v1.2.0/pspy32 
 	sudo curl -sL --create-dirs -o /opt/pspy/pspy64 https://github.com/DominicBreuker/pspy/releases/download/v1.2.0/pspy64 
@@ -320,15 +271,14 @@ optTools(){ #works
 	sudo curl -sL --create-dirs -o /opt/BloodHound/AzureHound.ps1 https://github.com/BloodHoundAD/BloodHound/blob/master/Collectors/AzureHound.ps1 
 	sudo curl -sL --create-dirs -o /opt/BloodHound/SharpHound.exe https://github.com/BloodHoundAD/BloodHound/blob/master/Collectors/SharpHound.exe 
 
-        #kerbrute
-        sudo curl -sL --create-dirs -o /opt/kerbrute_linux_amd64 https://github.com/ropnop/kerbrute/releases/download/v1.0.3/kerbrute_linux_amd64 && sudo ln -s /opt/kerbrute /usr/local/bin/kerbrute 
+	#kerbrute
+	sudo curl -sL --create-dirs -o /opt/kerbrute_linux_amd64 https://github.com/ropnop/kerbrute/releases/download/v1.0.3/kerbrute_linux_amd64 && sudo ln -s /opt/kerbrute /usr/local/bin/kerbrute 
 
-        #Sliver
-	if [[ -z `command -v sliver` ]]; then sudo git clone https://github.com/BishopFox/sliver.git /opt && cd /opt/sliver && curl https://sliver.sh/install|sudo bash fi
+	#Sliver
+	if [[ -z `command -v sliver` ]]; then sudo git clone https://github.com/BishopFox/sliver.git /opt && cd /opt/sliver && curl https://sliver.sh/install|sudo bash; fi
 
-        # nucli Templates
-        sudo git clone https://github.com/projectdiscovery/nuclei-templates.git /opt/nuclei-templates
-
+	# nucli Templates
+	sudo git clone https://github.com/projectdiscovery/nuclei-templates.git /opt/nuclei-templates
 }
 
 LocalGTFO(){
@@ -344,29 +294,11 @@ FirefoxPentestPlugins(){
 
 ################################################ Tool Collection Installs ################################################ 
 
-# GoTools(){
-# 	#Install go
-# 	installer go || installer go-lang
-#         wait $?
-# 	#Install web testing tools
-# 	go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
-# 	go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
-# 	go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-# 	#templates for web testing tools
-# }
-
-# RustTools(){
-#   installer cargo
-#   wait $?
-#   # install go tools
-#   cargo install rustscan
-#   installer fzf
-#   cargo install --locked navi
-#
-#
-# }
 BrewInstall(){
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  cd ~ && mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
+  eval "$(homebrew/bin/brew shellenv)"
+  brew update --force --quiet
+  chmod -R go-w "$(brew --prefix)/share/zsh"
 }
 
 installPentestTools(){
@@ -380,11 +312,11 @@ installPentestTools(){
 		continue
 	fi
 	wait $?
-        installer($manager) ${Pentest[*]}
+        installer ${Pentest[*]}
 	wait $?
 	optTools
         wait $?
-        [ ! -d "/usr/share/seclist" ] && installer($manager) seclists
+        [ ! -d "/usr/share/seclist" ] && installer seclists
         wait $?
         curl -sSL https://bootstrap.pypa.io/get-pip.py | python3
         wait $?
@@ -394,7 +326,8 @@ installPentestTools(){
         wait $?
         BrewInstall
         wait $?
-        isntaller("brew") ${BrewTools[*]}
+				local manager=brew
+        installer ${BrewTools[*]}
 	wait $?
 	LocalGTFO
 	wait $?
@@ -402,7 +335,7 @@ installPentestTools(){
 }
 
 installBasic(){
-  installer($manager) ${programsAll[*]}
+  installer ${programsAll[*]}
 	wait $?
 	zsh
 	wait $?
@@ -440,4 +373,5 @@ Configure(){
 			;;
 	esac
 } 
+
 Configure
