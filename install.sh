@@ -37,6 +37,8 @@ DOTfolder=$(find / -name DOTconf -type d 2> /dev/null | sed -n '1p')
 # - Conky install and config
 # - neofetch config and add to repo
 # - download flare-floss executable from https://github.com/mandiant/flare-floss/releases/tag/v2.0.0, put in /opt and link to /usr/bin or something
+# - ubuntu config export for gnome, this is not the same as arch
+# - increase speed of .zsh loading
 
 ################################################# General Functions #################################################
 
@@ -167,15 +169,15 @@ ConfigureGnome(){
   git clone https://github.com/EliverLara/candy-icons.git /usr/share/icons/candy-icons
   gsettings set org.gnome.desktop.interface icon-theme candy-icons
   
-  #load backup
+  #load backup (for arch)
   dconf load / < $DOTfolder/dconf-backup
   
   # night mode on
-  #gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
+  gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
  # Automatic night light schedule
-  #gsettings set org.gnome.settings-daemon.plugins.color night-light-schedule-automatic true
+  gsettings set org.gnome.settings-daemon.plugins.color night-light-schedule-automatic true
   #set dark theme
-  #gsettings set org.gnome.desktop.interface color-scheme prefer-dark | gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+  gsettings set org.gnome.desktop.interface color-scheme prefer-dark | gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 
   # Disable all gnome extensions
   #for ext in $(/usr/bin/ls ~/.local/share/gnome-shell/extensions); do 
@@ -361,3 +363,4 @@ Configure(){
 } 
 
 Configure
+
