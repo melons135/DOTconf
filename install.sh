@@ -59,6 +59,7 @@ installer(){ # the input takes the neame of the variable rather than its values 
 			echo -e "$info  \033[31m*\033[0m[ $pkg is Already Installed ]\033[31m*\033[0m"
 		else
 			echo -ne "$warning  \033[31m*\033[0m[ $pkg is Not Installed (Attempting to Install..) ]\033[31m*\033[0m\n"
+			if [[ $? -en 1 ]]; then echo -ne "$failure  \033[31m*\033[0m[ $pkg Failed to Install ]\033[31m*\033[0m\n"; fi
 			eval "$manager $pkg 1> /dev/null"
 			echo -ne "$success  \033[31m*\033[0m[ $pkg is Complete ]\033[31m*\033[0m\n"
 		fi
@@ -130,20 +131,23 @@ Installtmux(){
 }
 
 Installzsh(){
+	# install ohmyzsh (Install errors out and stops here)
+	if command -v zsh >/dev/null 2>&1; then
+		yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+		exit
+	else
+		installer zsh
+		yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+		exit
+	fi
+	
+	# set correct .zshrc
 	if [[ -a $HOME/.zshrc ]]
 	then
 		mv $HOME/.zshrc $HOME/.zshrc.bak
 		ln -s $DOTfolder/.zshrc $HOME/
 	else
 		ln -s $DOTfolder/.zshrc $HOME/
-	fi
-	
-	# install ohmyzsh (Install errors out and stops here)
-	if command -v zsh >/dev/null 2>&1; then
-		yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-	else
-		installer zsh
-		yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 	fi
 
 	# install extra plugins
@@ -158,7 +162,6 @@ Installzsh(){
 ConfigureGnome(){
   installer gnome-extensions
   
-
   # icon theme
   sudo mkdir -p /usr/share/icons/
   git clone https://github.com/EliverLara/candy-icons.git /usr/share/icons/candy-icons
@@ -296,22 +299,21 @@ installPentestTools(){
 		continue
 	fi
 	
-        installer ${Pentest[*]}
+    installer ${Pentest[*]}
 	
 	optTools
         
-        [ ! -d "/usr/share/seclist" ] && installer seclists
+    [ ! -d "/usr/share/seclist" ] && installer seclists
         
-        curl -sSL https://bootstrap.pypa.io/get-pip.py | python3
-        
-        python3 -m pip install --user pipx
+    curl -sSL https://bootstrap.pypa.io/get-pip.py | python3
+    python3 -m pip install --user pipx
 	
 	for i in ${pipxPrograms[*]}; do eval "pipx install $i"; done
         
-        BrewInstall
+    BrewInstall
         
-				local manager=brew
-        installer ${BrewTools[*]}
+	local manager="brew install"
+    installer ${BrewTools[*]}
 	
 	LocalGTFO
 	
@@ -321,7 +323,7 @@ installPentestTools(){
 installBasic(){
 	installer ${programsAll[*]}
 	
-	Installzsh # install fails in this function
+	Installzsh
 	
 	Installtmux
 	
