@@ -200,7 +200,7 @@ ConfigureNavi(){
 
 InstallWallpaper(){
   sudo cp -r $DOTfolder/Wallpapers/* /usr/share/backgrounds/
-  sudo mv $DOTfolder/Wallpapers/**/*.xml /usr/share/backgrounds/gnome/
+  sudo cp $DOTfolder/xml/* /usr/share/gnome-background-properties/
 }
 
 Neovim(){
