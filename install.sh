@@ -19,7 +19,7 @@ set -x pipefail
 programsAll=("git" "zsh" "python3" "tmux" "guake" "obsidian" "parcellite" "python-pip" "python-venv" "python-pipx" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "tor" "zip" "neofetch" "dconf")
 programsArch=("reflector" "gnome" "xorg-xrandr" "feh" "cronie" "fd" "ripgrep-all")
 # Pentest
-Pentest=("metasploit" "ffuf" "enum4linux" "feroxbuster" "gobuster" "nbtscan" "nikto" "nmap" "onesixtyone" "smbclient" "smbmap" "whatweb" "wkhtmltopdf" "sqlmap" "crackmapexec" "evil-winrm" "chisel" "onesixtyone" "oscanner" "redis-tools" "snmpwalk" "svwar" "tnscmd10g" "amass" "hashcat" "john" "webshells" "bettercap" "exploitdb" "sliver")
+Pentest=("metasploit" "ffuf" "enum4linux" "feroxbuster" "gobuster" "nbtscan" "nikto" "nmap" "onesixtyone" "smbclient" "smbmap" "whatweb" "wkhtmltopdf" "sqlmap" "crackmapexec" "evil-winrm" "chisel" "onesixtyone" "oscanner" "redis-tools" "snmpwalk" "svwar" "tnscmd10g" "amass" "hashcat" "john" "bettercap" "exploitdb" "sliver")
 pipxPrograms=("git+https://github.com/calebstewart/pwncat.git" "git+https://github.com/Tib3rius/AutoRecon.git" "impacket" "git+https://github.com/cddmp/enum4linux-ng" "bloodhound" "git+https://github.com/dirkjanm/mitm6.git" "pypykatz" "howdoi")
 BrewTools=("nuclei" "httpx" "subfinder" "proxychains-ng" "navi" "rustscan" "nim")
 # Reversing tools
@@ -39,6 +39,8 @@ DOTfolder=$(find / -name DOTconf -type d 2> /dev/null | sed -n '1p')
 # - download flare-floss executable from https://github.com/mandiant/flare-floss/releases/tag/v2.0.0, put in /opt and link to /usr/bin or something
 # - ubuntu config export for gnome, this is not the same as arch
 # - increase speed of .zsh loading
+# - homebrew doesnt get added to PATH
+# - 
 
 ################################################# General Functions #################################################
 
@@ -61,9 +63,8 @@ installer(){ # the input takes the neame of the variable rather than its values 
 			echo -e "$info  \033[31m*\033[0m[ $pkg is Already Installed ]\033[31m*\033[0m"
 		else
 			echo -ne "$warning  \033[31m*\033[0m[ $pkg is Not Installed (Attempting to Install..) ]\033[31m*\033[0m\n"
-			if [[ $? -en 1 ]]; then echo -ne "$failure  \033[31m*\033[0m[ $pkg Failed to Install ]\033[31m*\033[0m\n"; fi
 			eval "$manager $pkg 1> /dev/null"
-			echo -ne "$success  \033[31m*\033[0m[ $pkg is Complete ]\033[31m*\033[0m\n"
+			# if [[ $? -ne 1 ]]; then echo -ne "$failure  \033[31m*\033[0m[ $pkg Failed to Install ]\033[31m*\033[0m\n"; else echo -ne "$success  \033[31m*\033[0m[ $pkg is Complete ]\033[31m*\033[0m\n"; fi
 		fi
 	done
 }
@@ -136,11 +137,9 @@ Installzsh(){
 	# install ohmyzsh (Install errors out and stops here)
 	if command -v zsh >/dev/null 2>&1; then
 		yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-		exit
 	else
 		installer zsh
 		yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-		exit
 	fi
 	
 	# set correct .zshrc
@@ -150,12 +149,11 @@ Installzsh(){
 		ln -s $DOTfolder/.zshrc $HOME/
 	else
 		ln -s $DOTfolder/.zshrc $HOME/
-	fi
+	fi 
 
 	# install extra plugins
-    mkdir -p $HOME/.oh-my-zsh/plugins/
-	git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
-	git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
+	installer zsh-syntax-highlighting || mkdir -p $HOME/.oh-my-zsh/plugins/ && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+	installer zsh-autosuggestions || mkdir -p $HOME/.oh-my-zsh/plugins/ && git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
 	
 	# add chsh to zsh
 	sudo chsh -s `which zsh`
@@ -268,6 +266,9 @@ optTools(){
 
 	# nucli Templates
 	sudo git clone https://github.com/projectdiscovery/nuclei-templates.git /opt/nuclei-templates
+	
+	# Download Webshell Examples
+	sudo git clone https://gitlab.com/kalilinux/packages/webshells.git /opt/webshells
 }
 
 LocalGTFO(){
