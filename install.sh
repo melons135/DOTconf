@@ -63,7 +63,8 @@ installer(){ # the input takes the neame of the variable rather than its values 
 			echo -e "$info  \033[31m*\033[0m[ $pkg is Already Installed ]\033[31m*\033[0m"
 		else
 			echo -ne "$warning  \033[31m*\033[0m[ $pkg is Not Installed (Attempting to Install..) ]\033[31m*\033[0m\n"
-			eval "$manager $pkg 1> /dev/null"
+			eval "$manager $pkg"
+			echo -ne "$success  \033[31m*\033[0m[ $pkg is Complete ]\033[31m>33[31m*\033[0m\n"
 			# if [[ $? -ne 1 ]]; then echo -ne "$failure  \033[31m*\033[0m[ $pkg Failed to Install ]\033[31m*\033[0m\n"; else echo -ne "$success  \033[31m*\033[0m[ $pkg is Complete ]\033[31m*\033[0m\n"; fi
 		fi
 	done
@@ -78,7 +79,8 @@ header(){
 ################################################# Repos ################################################
 
 kaliRepo(){
-	wget -q -O - archive.kali.org/archive-key.asc | sudo apt-key add -
+	echo "deb http://http.kali.org/kali kali-rolling main contrib non-free" | sudo tee /etc/apt/sources.lis
+  update
 }
 
 blackArchInstall(){
@@ -152,8 +154,8 @@ Installzsh(){
 	fi 
 
 	# install extra plugins
-	installer zsh-syntax-highlighting || mkdir -p $HOME/.oh-my-zsh/plugins/ && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
-	installer zsh-autosuggestions || mkdir -p $HOME/.oh-my-zsh/plugins/ && git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
+	mkdir -p $HOME/.oh-my-zsh/plugins/ && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+	mkdir -p $HOME/.oh-my-zsh/plugins/ && git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
 	
 	# add chsh to zsh
 	sudo chsh -s `which zsh`
@@ -302,21 +304,22 @@ installPentestTools(){
 		continue
 	fi
 	
-    installer ${Pentest[*]}
+  installer ${Pentest[*]}
 	
 	optTools
         
-    [ ! -d "/usr/share/seclist" ] && installer seclists
+  [ ! -d "/usr/share/seclist" ] && installer seclists
         
-    curl -sSL https://bootstrap.pypa.io/get-pip.py | python3
-    python3 -m pip install --user pipx
+  curl -sSL https://bootstrap.pypa.io/get-pip.py | python3
+  python3 -m pip install --user pipx
 	
 	for i in ${pipxPrograms[*]}; do eval "pipx install $i"; done
         
-    BrewInstall
+  BrewInstall
         
 	local manager="brew install"
-    installer ${BrewTools[*]}
+
+  installer ${BrewTools[*]}
 	
 	LocalGTFO
 	
@@ -332,7 +335,7 @@ installBasic(){
 	
 	Neovim
 	
-    InstallWallpaper
+  InstallWallpaper
 	
 	if [[ -f /etc/arch-release ]]; then configureArch; fi
 	
