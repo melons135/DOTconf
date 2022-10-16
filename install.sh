@@ -16,12 +16,12 @@ set -x pipefail
 
 ################################################# Variables #################################################
 
-programsAll=("git" "zsh" "python3" "tmux" "guake" "obsidian" "parcellite" "python-pip" "python-venv" "python-pipx" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "tor" "zip" "neofetch" "dconf")
+programsAll=("git" "zsh" "python3" "tmux" "guake" "obsidian" "parcellite" "python3-pip" "python3-venv" "python3-pipx" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "tor" "zip" "neofetch" "dconf")
 programsArch=("reflector" "gnome" "xorg-xrandr" "feh" "cronie" "fd" "ripgrep-all")
 # Pentest
 Pentest=("metasploit" "ffuf" "enum4linux" "feroxbuster" "gobuster" "nbtscan" "nikto" "nmap" "onesixtyone" "smbclient" "smbmap" "whatweb" "wkhtmltopdf" "sqlmap" "crackmapexec" "evil-winrm" "chisel" "onesixtyone" "oscanner" "redis-tools" "snmpwalk" "svwar" "tnscmd10g" "amass" "hashcat" "john" "bettercap" "exploitdb" "sliver")
 pipxPrograms=("git+https://github.com/calebstewart/pwncat.git" "git+https://github.com/Tib3rius/AutoRecon.git" "impacket" "git+https://github.com/cddmp/enum4linux-ng" "bloodhound" "git+https://github.com/dirkjanm/mitm6.git" "pypykatz" "howdoi")
-BrewTools=("nuclei" "httpx" "subfinder" "proxychains-ng" "navi" "rustscan" "nim")
+BrewTools=("nuclei" "httpx" "subfinder" "proxychains-ng" "navi" "rustscan" "nim" "zeek" "sublime" "--cask obsidian" "--cask sublime-text")
 # Reversing tools
 Reversing=("ltrace" "strace" "ghidra" "strings" "binwalk")
 pipReversting=("oletools")
@@ -40,7 +40,7 @@ DOTfolder=$(find / -name DOTconf -type d 2> /dev/null | sed -n '1p')
 # - ubuntu config export for gnome, this is not the same as arch
 # - increase speed of .zsh loading
 # - homebrew doesnt get added to PATH
-# - 
+# - Add rotten potato and juicy potato ng from (https://github.com/antonioCoco/JuicyPotatoNG) and Print nighttmare (https://github.com/calebstewart/CVE-2021-1675)
 
 ################################################# General Functions #################################################
 
@@ -241,10 +241,6 @@ optTools(){
 	sudo curl -sL --create-dirs -o /opt/SeImpersonatePrivilege/PrintSpoofer/PrintSpoofer64.exe ttps://github.com/itm4n/PrintSpoofer/releases/download/v1.0/PrintSpoofer64.exe
 	sudo curl -sL --create-dirs -o /opt/SeImpersonatePrivilege/PrintSpoofer/README.md https://raw.githubusercontent.com/itm4n/PrintSpoofer/master/README.md
 
-	sudo curl -sL --create-dirs -o /opt/SeImpersonatePrivilege/PrintSpoofer/PrintSpoofer32.exe https://github.com/itm4n/PrintSpoofer/releases/download/v1.0/PrintSpoofer32.exe 
-	sudo curl -sL --create-dirs -o /opt/SeImpersonatePrivilege/PrintSpoofer/PrintSpoofer64.exe ttps://github.com/itm4n/PrintSpoofer/releases/download/v1.0/PrintSpoofer64.exe 
-	sudo curl -sL --create-dirs -o /opt/SeImpersonatePrivilege/PrintSpoofer/README.md https://raw.githubusercontent.com/itm4n/PrintSpoofer/master/README.md 
-
 	# Responder install 
 	sudo git clone https://github.com/lgandx/Responder /opt/Responder && sudo ln -s /opt/Responder/responder.py /usr/local/bin/responder 
 	sudo chmod +x /usr/local/bin/responder 
@@ -273,6 +269,13 @@ optTools(){
 	sudo git clone https://gitlab.com/kalilinux/packages/webshells.git /opt/webshells
 }
 
+# InstallZeek(){
+#   local version=$(lsb_release -d | awk '{print $2}')"_"$(lsb_release -r | awk '{print $2}')
+#   echo "deb http://download.opensuse.org/repositories/security:/zeek/x$version/ /" | sudo tee /etc/apt/sources.list.d/security:zeek.list
+#   curl -fsSL https://download.opensuse.org/repositories/security:zeek/x$version/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/security_zeek.gpg > /dev/null
+#   sudo apt update && sudo apt install zeek-lts
+# }
+
 LocalGTFO(){
 	GTFOpy="$DOTfolder/Databases/GTFOBLookup"
 	pip install -r $GTFOpy/requirements.txt
@@ -287,10 +290,11 @@ FirefoxPentestPlugins(){
 ################################################ Tool Collection Installs ################################################ 
 
 BrewInstall(){
-  cd ~ && mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
-  eval "$(homebrew/bin/brew shellenv)"
-  brew update --force --quiet
-  chmod -R go-w "$(brew --prefix)/share/zsh"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  # cd ~ && mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
+  # eval "$(homebrew/bin/brew shellenv)"
+  # brew update --force --quiet
+  # chmod -R go-w "$(brew --prefix)/share/zsh"
 }
 
 installPentestTools(){

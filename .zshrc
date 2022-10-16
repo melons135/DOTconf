@@ -139,6 +139,17 @@ alias rustscan='sudo docker run -it --rm --name rustscan cmnatic/rustscan:debian
 #Spin-up docker
 alias dockerit='sudo docker run -it --rm -v $PWD/$2:/ --entrypoint=/bin/bash $2'
 
+# SMBeagle
+function smbeagle(){
+  if [ -z $1 ]; then
+    read -p 'List network CIDR (space seperated): ' networks
+  else
+    $@=networks
+  fi
+  read -p 'To use crednetials, please list the username and password in the following format (-u <USERNAME> -p <PASSWORD>): ' creds
+  sudo docker run -v "./output:/tmp/output" punksecurity/smbeagle -c /tmp/output/results.csv -n $networks $creds
+}
+
 #torify proxy
 alias hide='if [ `systemctl is-active` = 'inactive'] ; do systemctl start tor ;fi ; source torsocks on'
 alias unhide='source torsocks off'
@@ -210,7 +221,6 @@ py3_tty_upgrade () {
 }
 
 
-
 #GTFOBlookup scripts
 # from https://github.com/nccgroup/GTFOBLookup
 GTFOBLookup=$(find / -name gtfoblookup.py -type f 2>/dev/null)
@@ -254,7 +264,7 @@ update(){
 	for f in ${(@f)osInfo}; do if [[ -f $f ]]; then eval $osInfo[$f]; fi; done
 }
 
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/.nimble/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/homebrew/bin:$PATH" #$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$HOME/.cargo/bin
 
 # nvai widgit
 eval "$(navi widget zsh)"
