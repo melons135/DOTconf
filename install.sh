@@ -16,7 +16,7 @@ set -x pipefail
 
 ################################################# Variables #################################################
 
-programsAll=("git" "zsh" "python3" "tmux" "guake" "obsidian" "parcellite" "python3-pip" "python3-venv" "python3-pipx" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "tor" "zip" "neofetch" "dconf")
+programsAll=("git" "zsh" "python3" "tmux" "guake" "obsidian" "parcellite" "python3-pip" "python3-venv" "python3-pipx" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "tor" "zip" "neofetch" "dconf" "etckeeper")
 programsArch=("reflector" "gnome" "xorg-xrandr" "feh" "cronie" "fd" "ripgrep-all")
 # Pentest
 Pentest=("metasploit" "ffuf" "enum4linux" "feroxbuster" "gobuster" "nbtscan" "nikto" "nmap" "onesixtyone" "smbclient" "smbmap" "whatweb" "wkhtmltopdf" "sqlmap" "crackmapexec" "evil-winrm" "chisel" "onesixtyone" "oscanner" "redis-tools" "snmpwalk" "svwar" "tnscmd10g" "amass" "hashcat" "john" "bettercap" "exploitdb" "sliver")
