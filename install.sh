@@ -212,6 +212,24 @@ Neovim(){
 	curl -sLf https://spacevim.org/install.sh | bash
 }
 
+Docker(){
+  # Remove previous docker tools
+  sudo apt-get remove docker docker-engine docker.io containerd runc
+  # Install dependancies
+  sudo apt-get install ca-certificates curl gnupg lsb-release
+  # Add keys
+  sudo mkdir -p /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  # Add repo
+  echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  # Update
+  sudo apt-get update
+  if [ $? -nq 0 ]; then sudo chmod a+r /etc/apt/keyrings/docker.gpg && sudo apt-get update; fi
+  # Install docker
+  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+}
+
 ################################################# Misc. Tools #################################################
 
 optTools(){
