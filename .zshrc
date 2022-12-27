@@ -62,7 +62,7 @@ COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
 # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # or set a custom format using the strftime function format specifications,
 # see 'man strftime' for details.
- HIST_STAMPS="dd/mm/yyyy"
+HIST_STAMPS="yyyy/mm/dd"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
@@ -169,10 +169,22 @@ alias dockerit='sudo docker run -it --rm -v $PWD/$2:/ $2'
 # Bloodhound
 alias bloodhound='xhost + && sudo docker run -it --rm -v /tmp/.X11-unix/:/tmp/.X11-unix -e DISPLAY=$DISPLAY --network host --name bloodhound bannsec/bloodhound'
 
+# Start JuiceShop Docker
+alias JuiceShop='docker run -d -p 80:3000 bkimminich/juice-shop'
+
 alias script_tty_upgrade="echo '/usr/bin/script -qc /bin/bash /dev/null'| xclip -sel clip"
 alias tty_fix="stty raw -echo; fg; reset"
 alias tty_conf="stty -a | sed 's/;//g' | head -n 1 | sed 's/.*baud /stty /g;s/line.*//g' | xclip -sel clip"
 
+# Batcat alias
+alias bat="batcat"
+
+# Quick resurect tmux session
+alias mux='pgrep -vx tmux > /dev/null && \
+		tmux new -d -s delete-me && \
+		tmux run-shell ~/.tmux/plugins/tmux-resurrect/scripts/restore.sh && \
+		tmux kill-session -t delete-me && \
+		tmux attach || tmux attach'
 
 ## Functions
 

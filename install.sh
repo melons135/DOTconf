@@ -34,7 +34,7 @@ DOTfolder=$(find / -name DOTconf -type d 2> /dev/null | sed -n '1p')
 # - burp
 # - Gnome extension: check top gnome extesntions, probably system monitor, clipboard, IPs, desktops, dash to dock,  
 # - ZSH Theme concept: https://github.com/ohmyzsh/ohmyzsh/wiki/Themes#jonathan & https://github.com/ohmyzsh/ohmyzsh/wiki/Themes#xiong-chiamiov-plus
-# - Conky install and config
+# - [not] Conky install and config
 # - neofetch config and add to repo
 # - download flare-floss executable from https://github.com/mandiant/flare-floss/releases/tag/v2.0.0, put in /opt and link to /usr/bin or something
 # - ubuntu config export for gnome, this is not the same as arch
@@ -79,7 +79,8 @@ header(){
 ################################################# Repos ################################################
 
 kaliRepo(){
-	echo "deb http://http.kali.org/kali kali-rolling main contrib non-free" | sudo tee /etc/apt/sources.lis
+	echo "deb http://http.kali.org/kali kali-rolling main contrib non-free" | sudo tee /etc/apt/sources.list
+  sudo wget https://archive.kali.org/archive-key.asc -O /etc/apt/trusted.gpg.d/kali-archive-keyring.asc
   update
 }
 
@@ -115,8 +116,8 @@ configureArch(){
 
 	# reflector
 	sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-  	sudo reflector --save /etc/pacman.d/mirrorlist -c GB --protocol https --latest 5
-        update
+  sudo reflector --save /etc/pacman.d/mirrorlist -c GB --protocol https --latest 5
+  update
 }
 
 Installtmux(){
@@ -129,10 +130,13 @@ Installtmux(){
 		ln -s $DOTfolder/.tmux.conf $HOME/
 	fi
 	
-	if [[ ! -a ~/.tmux/plugins/tmp ]]
+	if [[ ! -a ~/.tmux/plugins/tpm ]]
 	then
-		git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+		mkdir -p ~/.tmux/plugins/tpm && git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 	fi
+
+  # Install plugins
+  tmux -c '$HOME/.tmux/plugins/tpm/scripts/install_plugins.sh'
 }
 
 Installzsh(){
@@ -212,6 +216,17 @@ Neovim(){
 	curl -sLf https://spacevim.org/install.sh | bash
 }
 
+Sublime-Text-Ubuntu(){
+  # Install key
+  wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg > /dev/null
+  # Install stable chanel
+  echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+  
+  #Update and install
+  sudo apt update
+  sudo apt install sublime-text
+}
+
 Docker(){
   # Remove previous docker tools
   sudo apt-get remove docker docker-engine docker.io containerd runc
@@ -230,7 +245,7 @@ Docker(){
   sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 }
 
-################################################# Misc. Tools #################################################
+################################################ Misc. Tools #################################################
 
 optTools(){
 	# pspy
