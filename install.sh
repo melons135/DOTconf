@@ -79,7 +79,8 @@ header(){
 ################################################# Repos ################################################
 
 kaliRepo(){
-	echo "deb http://http.kali.org/kali kali-rolling main contrib non-free" | sudo tee /etc/apt/sources.list
+  # Add to file dont clobber
+	# echo "deb http://http.kali.org/kali kali-rolling main contrib non-free" | sudo tee /etc/apt/sources.list
   sudo wget https://archive.kali.org/archive-key.asc -O /etc/apt/trusted.gpg.d/kali-archive-keyring.asc
   update
 }
