@@ -43,7 +43,7 @@ zstyle ':omz:update' frequency 14
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-ENABLE_CORRECTION="true"
+ENABLE_CORRECTION="false"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # You can also set it to another string to have that shown instead of the default red dots.
@@ -73,7 +73,7 @@ HIST_STAMPS="yyyy/mm/dd"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 
-plugins=(git zsh-syntax-highlighting zsh-autosuggestions compleat)
+plugins=(git zsh-syntax-highlighting zsh-autosuggestions) # compleat)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -93,23 +93,12 @@ fi
 
 if [[ neofetch ]]; then neofetch; fi
 
-export MYIP=$(ip addr show tun0 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' --color=none)
-
+# export MYIP=$(ip addr show tun0 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' --color=none)
 
 ## Aliases
 
-#encoding translation
-alias rot13="tr 'A-Za-z' 'N-ZA-Mn-za-m'"
-alias urldecode="sed 's@+@ @g;s@%@\\\\x@g' | xargs -0 printf '%b'"
-
 #internet QOL
 alias www="firefox -url $1 &"
-
-#move to try hack me folder
-alias thmdir="cd ~/Documents/TryHackMe/ && ls"
-
-#move to Hackthebox folder
-alias htbdir="cd ~/Documents/Hackthebox/ && ls"
 
 #git QOL things
 alias gitgraph="git log --all --graph --decorate"
@@ -121,17 +110,8 @@ alias clip='xclip -selection clipboard'
 alias untar="tar -xvf $@"
 alias viewtar="tar -tvf $@"
 
-#get external ip
-alias externalip='curl https://api.ipify.org/'
-
-#get distro info
-alias distro='cat /etc/*-release'
-
 #reload zsh
 alias reload='source ~/.zshrc'
-
-#zshrc change
-alias zshrc='sudo vim ~/.zshrc'
 
 #rustscan in docker
 alias rustscan='sudo docker run -it --rm --name rustscan cmnatic/rustscan:debian-buster rustscan'
@@ -169,13 +149,6 @@ alias dockerit='sudo docker run -it --rm -v $PWD/$2:/ $2'
 # Bloodhound
 alias bloodhound='xhost + && sudo docker run -it --rm -v /tmp/.X11-unix/:/tmp/.X11-unix -e DISPLAY=$DISPLAY --network host --name bloodhound bannsec/bloodhound'
 
-# Start JuiceShop Docker
-alias JuiceShop='docker run -d -p 80:3000 bkimminich/juice-shop'
-
-alias script_tty_upgrade="echo '/usr/bin/script -qc /bin/bash /dev/null'| xclip -sel clip"
-alias tty_fix="stty raw -echo; fg; reset"
-alias tty_conf="stty -a | sed 's/;//g' | head -n 1 | sed 's/.*baud /stty /g;s/line.*//g' | xclip -sel clip"
-
 # Batcat alias
 alias bat="batcat"
 
@@ -192,15 +165,6 @@ alias mux='pgrep -vx tmux > /dev/null && \
 mk() {
 	mkdir $1
 	cd $1
-}
-smk() {
-	sudo mkdir $1
-	cd $1
-}
-
-# Change directory and ls
-cdl() {
-	cd $1 && ls
 }
 
 #start python server
@@ -224,14 +188,9 @@ function backup(){
   sudo cp $(realpath $1){,.bak}
 }
 
-Update(){
+update(){
   bash -c 'declare -A osInfo=([/etc/redhat-release]="sudo yum update -y" [/etc/arch-release]="sudo pacman -Syu" [/etc/debian_version]="sudo apt update && sudo apt upgrade -y" [/etc/alpine-release]="sudo apk update -y") && for f in ${!osInfo[@]}; do if [[ -f $f ]]; then eval ${osInfo[$f]}; fi; done'
 }
-
-py3_tty_upgrade () {
-   echo "python3 -c 'import pty;pty.spawn(\"/bin/bash\")'"| xclip -sel clip
-}
-
 
 #GTFOBlookup scripts
 # from https://github.com/nccgroup/GTFOBLookup
@@ -257,26 +216,13 @@ compare(){
 	if [[ ! $( diff <(echo $1) <(echo $2)) ]]; then echo Match; else diff <(echo $1) <(echo $2); fi
 }
 
-#connect to VPNs
-tryhackme() {
-	sudo pkill openvpn;
-	sudo openvpn ~/Documents/OVPN/melons135.ovpn&
-}
-hackthebox(){
-	sudo pkill openvpn;
-	sudo openvpn ~/Documents/OVPN/lab_0xCthu1hu.ovpn&
-}
-closevpn(){
-	sudo pkill openvpn
-}
-
 update(){
 	typeset -A osInfo
 	osInfo=(/etc/redhat-release 'sudo yum update -y' '/etc/arch-release' 'sudo pacman -Syu' /etc/debian_version 'sudo apt update && sudo apt upgrade' /etc/alpine-release 'sudo apk update -y')
 	for f in ${(@f)osInfo}; do if [[ -f $f ]]; then eval $osInfo[$f]; fi; done
 }
 
-export PATH="$HOME/.local/bin:$HOME/homebrew/bin:$PATH" #$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$HOME/.cargo/bin
+export PATH="$HOME/.local/bin:/home/linuxbrew/.linuxbrew:$PATH" #$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$HOME/.cargo/bin
 
 # nvai widgit
 eval "$(navi widget zsh)"

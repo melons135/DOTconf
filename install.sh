@@ -9,19 +9,21 @@ downloading="\033[32m[\033[0m Downloading    \033[32m]\033[0m\r"&&
 
 usage(){
 	echo "This script is for setting up linux distros how I like them."
-        echo "Specifically Ubuntu and Arch"
+  echo "Specifically Ubuntu and Arch"
 }
 
-set -x pipefail
+# set -x pipefail
 
 ################################################# Variables #################################################
 
-programsAll=("git" "zsh" "python3" "tmux" "guake" "obsidian" "parcellite" "python3-pip" "python3-venv" "python3-pipx" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "tor" "zip" "neofetch" "dconf" "etckeeper")
+programsAll=("git" "zsh" "python3" "tmux" "guake" "parcellite" "python3-pip" "python3-venv" "ssh" "openvpn" "firefox" "ufw" "curl" "jq" "docker" "tor" "zip" "neofetch" "dconf" "etckeeper")
 programsArch=("reflector" "gnome" "xorg-xrandr" "feh" "cronie" "fd" "ripgrep-all")
 # Pentest
 Pentest=("metasploit" "ffuf" "enum4linux" "feroxbuster" "gobuster" "nbtscan" "nikto" "nmap" "onesixtyone" "smbclient" "smbmap" "whatweb" "wkhtmltopdf" "sqlmap" "crackmapexec" "evil-winrm" "chisel" "onesixtyone" "oscanner" "redis-tools" "snmpwalk" "svwar" "tnscmd10g" "amass" "hashcat" "john" "bettercap" "exploitdb" "sliver")
 pipxPrograms=("git+https://github.com/calebstewart/pwncat.git" "git+https://github.com/Tib3rius/AutoRecon.git" "impacket" "git+https://github.com/cddmp/enum4linux-ng" "bloodhound" "git+https://github.com/dirkjanm/mitm6.git" "pypykatz" "howdoi")
-BrewTools=("nuclei" "httpx" "subfinder" "proxychains-ng" "navi" "rustscan" "nim" "zeek" "sublime" "--cask obsidian" "--cask sublime-text")
+BrewTools=("navi" "nim")
+BrewToolsPentest=("nuclei" "httpx" "subfinder" "proxychains-ng" "rustscan")
+BrewToolsNetwork=("zeek")
 # Reversing tools
 Reversing=("ltrace" "strace" "ghidra" "strings" "binwalk")
 pipReversting=("oletools")
@@ -34,23 +36,24 @@ DOTfolder=$(find / -name DOTconf -type d 2> /dev/null | sed -n '1p')
 # - burp
 # - Gnome extension: check top gnome extesntions, probably system monitor, clipboard, IPs, desktops, dash to dock,  
 # - ZSH Theme concept: https://github.com/ohmyzsh/ohmyzsh/wiki/Themes#jonathan & https://github.com/ohmyzsh/ohmyzsh/wiki/Themes#xiong-chiamiov-plus
-# - [not] Conky install and config
-# - neofetch config and add to repo
 # - download flare-floss executable from https://github.com/mandiant/flare-floss/releases/tag/v2.0.0, put in /opt and link to /usr/bin or something
 # - ubuntu config export for gnome, this is not the same as arch
 # - increase speed of .zsh loading
-# - homebrew doesnt get added to PATH
 # - Add rotten potato and juicy potato ng from (https://github.com/antonioCoco/JuicyPotatoNG) and Print nighttmare (https://github.com/calebstewart/CVE-2021-1675)
+# - kali requires '-t kali-rolling' after apt command with this setup, add 'kali-get' to zshrc file
+# - add networking tools install
+# - obsidian link is correct but links to 404 due to %0D contained in Version variable
+# - apply version program to /opt downloads
 
 ################################################# General Functions #################################################
 
 # packageManager(){
-declare -A osInfo=([/etc/redhat-release]="sudo yum install -y" [/etc/arch-release]="sudo pacman --noconfirm -S" [/etc/debian_version]="sudo apt install -y" [etc/alpine-release]="sudo apk add -y")
-for f in ${!osInfo[@]}; do if [[ -f $f ]]; then manager=${osInfo[$f]} && break; fi; done
+# declare -A osInfo=([/etc/redhat-release]="sudo yum install -y" [/etc/arch-release]="sudo pacman --noconfirm -S" [/etc/debian_version]="sudo apt install -y" [etc/alpine-release]="sudo apk add -y")
+# for f in ${!osInfo[@]}; do if [[ -f $f ]]; then manager=${osInfo[$f]} && break; fi; done
 # }
 
 update(){
-	declare -A osInfo=([/etc/redhat-release]='sudo yum update -y' [/etc/arch-release]='sudo pacman -Syu' [/etc/debian_version]='sudo apt update && sudo apt upgrade -y' [/etc/alpine-release]='sudo apk update -y')
+  declare -A osInfo=([/etc/redhat-release]='sudo yum update -y' [/etc/arch-release]='sudo pacman -Syu' [/etc/debian_version]='sudo apt update && sudo apt upgrade -y' [/etc/alpine-release]='sudo apk update -y')
 	for f in ${!osInfo[@]}; do if [[ -f $f ]]; then header "Updating" && eval ${osInfo[$f]} 1>/dev/null; fi; done
 }
 
@@ -79,10 +82,16 @@ header(){
 ################################################# Repos ################################################
 
 kaliRepo(){
-  # Add to file dont clobber
-	# echo "deb http://http.kali.org/kali kali-rolling main contrib non-free" | sudo tee /etc/apt/sources.list
-  sudo wget https://archive.kali.org/archive-key.asc -O /etc/apt/trusted.gpg.d/kali-archive-keyring.asc
-  update
+	echo "[i] Adding kali repository to apt sources"
+	sudo sh -c "echo 'deb https://http.kali.org/kali kali-rolling main non-free contrib' > /etc/apt/sources.list.d/kali.list"
+	sudo chmod 644 /etc/apt/sources.list.d/kali.list
+	sudo apt install gnupg
+	sudo wget https://archive.kali.org/archive-key.asc -O /etc/apt/trusted.gpg.d/kali-archive-keyring.asc
+	echo "[i] setting low priority for kali repository"
+	sudo sh -c "echo 'Package: *'>/etc/apt/preferences.d/kali.pref; echo 'Pin: release a=kali-rolling'>>/etc/apt/preferences.d/kali.pref; echo 'Pin-Priority: 50'>>/etc/apt/preferences.d/kali.pref"
+	sudo chmod 644 /etc/apt/preferences.d/kali.pref
+	# Add to file dont clobber
+	update
 }
 
 blackArchInstall(){
@@ -113,12 +122,12 @@ blackArchInstall(){
 ################################################ Configurations ################################################
 
 configureArch(){
-  installer ${programsArch[*]}
+	installer ${programsArch[*]}
 
 	# reflector
 	sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-  sudo reflector --save /etc/pacman.d/mirrorlist -c GB --protocol https --latest 5
-  update
+	sudo reflector --save /etc/pacman.d/mirrorlist -c GB --protocol https --latest 5
+	update
 }
 
 Installtmux(){
@@ -136,8 +145,8 @@ Installtmux(){
 		mkdir -p ~/.tmux/plugins/tpm && git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 	fi
 
-  # Install plugins
-  tmux -c '$HOME/.tmux/plugins/tpm/scripts/install_plugins.sh'
+	# Install plugins
+	tmux -c '$HOME/.tmux/plugins/tpm/scripts/install_plugins.sh'
 }
 
 Installzsh(){
@@ -159,55 +168,55 @@ Installzsh(){
 	fi 
 
 	# install extra plugins
-	mkdir -p $HOME/.oh-my-zsh/plugins/ && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
-	mkdir -p $HOME/.oh-my-zsh/plugins/ && git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
+	git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $HOME/.oh-my-zsh/plugins/zsh-syntax-highlighting
+	git clone https://github.com/zsh-users/zsh-autosuggestions.git $HOME/.oh-my-zsh/plugins/zsh-autosuggestions
 	
 	# add chsh to zsh
 	sudo chsh -s `which zsh`
 }
 
 ConfigureGnome(){
-  installer gnome-extensions
-  
-  # icon theme
-  sudo mkdir -p /usr/share/icons/
-  git clone https://github.com/EliverLara/candy-icons.git /usr/share/icons/candy-icons
-  gsettings set org.gnome.desktop.interface icon-theme candy-icons
-  
-  #load backup (for arch)
-  dconf load / < $DOTfolder/dconf-backup
-  
-  # night mode on
-  gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
- # Automatic night light schedule
-  gsettings set org.gnome.settings-daemon.plugins.color night-light-schedule-automatic true
-  #set dark theme
-  gsettings set org.gnome.desktop.interface color-scheme prefer-dark | gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+	installer gnome-extensions
 
-  # Disable all gnome extensions
-  #for ext in $(/usr/bin/ls ~/.local/share/gnome-shell/extensions); do 
-  #  gnome-extensions disable $ext
-  #done
+	# icon theme
+	sudo mkdir -p /usr/share/icons/
+	git clone https://github.com/EliverLara/candy-icons.git /usr/share/icons/candy-icons
+	gsettings set org.gnome.desktop.interface icon-theme candy-icons
 
-  #enable required extensions
-  #gnome-extensions enable apps-menu@gnome-shell-extensions.gcampax.github.com
-  # dash-to-dock config
-  #
-  #gsettings set org.gnome.shell.extensions.dash-to-dock intellihide true
-  #gsettings set org.gnome.shell.extensions.dash-to-dock autohide true
-  #gsettings set org.gnome.shell.extensions.dash-to-dock autohide-in-fullscreen true
+	#load backup (for arch)
+	dconf load / < $DOTfolder/dconf-backup
+
+	# night mode on
+	gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
+	# Automatic night light schedule
+	gsettings set org.gnome.settings-daemon.plugins.color night-light-schedule-automatic true
+	#set dark theme
+	gsettings set org.gnome.desktop.interface color-scheme prefer-dark | gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+
+	# Disable all gnome extensions
+	#for ext in $(/usr/bin/ls ~/.local/share/gnome-shell/extensions); do 
+	#  gnome-extensions disable $ext
+	#done
+
+	#enable required extensions
+	#gnome-extensions enable apps-menu@gnome-shell-extensions.gcampax.github.com
+	# dash-to-dock config
+	#
+	#gsettings set org.gnome.shell.extensions.dash-to-dock intellihide true
+	#gsettings set org.gnome.shell.extensions.dash-to-dock autohide true
+	#gsettings set org.gnome.shell.extensions.dash-to-dock autohide-in-fullscreen true
 
 }
 
 ConfigureNavi(){
-  navi repo add https://github.com/denisidoro/cheats
-  navi repo add https://github.com/denisidoro/navi-tldr-pages
-  navi repo add https://github.com/melons135/Melons.cheat
+	navi repo add https://github.com/denisidoro/cheats
+	navi repo add https://github.com/denisidoro/navi-tldr-pages
+	navi repo add https://github.com/melons135/Melons.cheat
 }
 
 InstallWallpaper(){
-  sudo cp -r $DOTfolder/Wallpapers/* /usr/share/backgrounds/
-  sudo cp $DOTfolder/xml/* /usr/share/gnome-background-properties/
+	sudo cp -r $DOTfolder/Wallpapers/* /usr/share/backgrounds/
+	sudo cp $DOTfolder/xml/* /usr/share/gnome-background-properties/
 }
 
 Neovim(){
@@ -215,43 +224,84 @@ Neovim(){
 	
 	# install space vim
 	curl -sLf https://spacevim.org/install.sh | bash
+
+  # Check installed in the correct place (this will clobber current config)
+  if [[ -L $HOME/.nvim  ]]; then mv $HOME/.nvim $HOME/config/nvim; fi
+}
+
+Obsidian-Snap(){
+	PACKAGE="obsidian-latest.snap"
+	RELEASES_URL="https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest"
+	DOWNLOAD_URL="$(wget -q "${RELEASES_URL}" -O - | jq -r '.assets[] | select(.name | endswith("_amd64.snap")) | .browser_download_url')"
+
+	# Download snap image
+	wget "${DOWNLOAD_URL}" -O "/tmp/${PACKAGE}"
+
+	#snap install
+	sudo snap install --dangerous "${PACKAGE}" --classic
+
+	# Cleanup 
+	rm "${PACKAGE}"
+}
+
+Powershell-Ubuntu(){
+  # Update the list of packages
+  update
+  # Install pre-requisite packages.
+  installer apt-transport-https software-properties-common
+  # Download the Microsoft repository GPG keys
+  wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
+  # Register the Microsoft repository GPG keys
+  sudo dpkg -i packages-microsoft-prod.deb
+  # Update the list of packages after we added packages.microsoft.com
+  update
+  # Install PowerShell
+  installer powershell
 }
 
 Sublime-Text-Ubuntu(){
-  # Install key
-  wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg > /dev/null
-  # Install stable chanel
-  echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
-  
-  #Update and install
-  sudo apt update
-  sudo apt install sublime-text
+	# Install key
+	wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg > /dev/null
+
+	# Install stable chanel
+	echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+	
+	#Update and install
+	sudo apt update
+	sudo apt install sublime-text
 }
 
 Docker(){
-  # Remove previous docker tools
-  sudo apt-get remove docker docker-engine docker.io containerd runc
-  # Install dependancies
-  sudo apt-get install ca-certificates curl gnupg lsb-release
-  # Add keys
-  sudo mkdir -p /etc/apt/keyrings
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-  # Add repo
-  echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  # Update
-  sudo apt-get update
-  if [ $? -nq 0 ]; then sudo chmod a+r /etc/apt/keyrings/docker.gpg && sudo apt-get update; fi
-  # Install docker
-  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+	# Remove previous docker tools
+	sudo apt-get remove docker docker-engine docker.io containerd runc
+	# Install dependancies
+	sudo apt-get install ca-certificates curl gnupg lsb-release
+	# Add keys
+	sudo mkdir -p /etc/apt/keyrings
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+	# Add repo
+	echo \
+	"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+	# Update
+	sudo apt-get update
+	if [ $? -nq 0 ]; then sudo chmod a+r /etc/apt/keyrings/docker.gpg && sudo apt-get update; fi
+	# Install docker
+	sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 }
 
 ################################################ Misc. Tools #################################################
 
+GetLatestsGit(){
+  repo=$1 
+  # select version from latest
+  Latest=$(curl -J https://api.github.com/repos/$repo/releases | jq '.[] | .tag_name' | sed -n 1p | sed 's/\"//g')
+}
+
 optTools(){
 	# pspy
-	sudo curl -sL --create-dirs -o /opt/pspy/pspy32 https://github.com/DominicBreuker/pspy/releases/download/v1.2.0/pspy32 
-	sudo curl -sL --create-dirs -o /opt/pspy/pspy64 https://github.com/DominicBreuker/pspy/releases/download/v1.2.0/pspy64 
+  GetLatestsGit DominicBreuker/pspy
+	sudo curl -sL --create-dirs -o /opt/pspy/pspy32 https://github.com/DominicBreuker/pspy/releases/download/$Latest/pspy32 
+	sudo curl -sL --create-dirs -o /opt/pspy/pspy64 https://github.com/DominicBreuker/pspy/releases/download/$Latest/pspy64 
 	
 	# LinPEAS 
 	sudo curl -sL --create-dirs -o /opt/PEAS/linpeas.sh https://github.com/carlospolop/PEASS-ng/releases/download/20220424/linpeas.sh 
@@ -291,7 +341,8 @@ optTools(){
 	sudo curl -sL --create-dirs -o /opt/BloodHound/SharpHound.exe https://github.com/BloodHoundAD/BloodHound/blob/master/Collectors/SharpHound.exe 
 
 	#kerbrute
-	sudo curl -sL --create-dirs -o /opt/kerbrute_linux_amd64 https://github.com/ropnop/kerbrute/releases/download/v1.0.3/kerbrute_linux_amd64 && sudo ln -s /opt/kerbrute /usr/local/bin/kerbrute 
+  GetLatestsGit ropnop/kerbrute
+	sudo curl -sL --create-dirs -o /opt/kerbrute_linux_amd64 https://github.com/ropnop/kerbrute/releases/download/$Latest/kerbrute_linux_amd64 && sudo ln -s /opt/kerbrute /usr/local/bin/kerbrute 
 
 	#Sliver
 	if [[ -z `command -v sliver` ]]; then sudo git clone https://github.com/BishopFox/sliver.git /opt && cd /opt/sliver && curl https://sliver.sh/install|sudo bash; fi
@@ -300,7 +351,11 @@ optTools(){
 	sudo git clone https://github.com/projectdiscovery/nuclei-templates.git /opt/nuclei-templates
 	
 	# Download Webshell Examples
-	sudo git clone https://gitlab.com/kalilinux/packages/webshells.git /opt/webshells
+	# sudo git clone https://gitlab.com/kalilinux/packages/webshells.git /opt/webshells
+  #
+  # Download flarefloss
+  GetLatestsGit mandiant/flare-floss
+  sudo curl -sL --create-dirs -o /opt/Floss https://github.com/mandiant/flare-floss/releases/download/$Latest/floss-$Latest-linux.zip && sudo ln -s /opt/Floss /usr/local/bin/floss
 }
 
 # InstallZeek(){
@@ -324,16 +379,18 @@ FirefoxPentestPlugins(){
 ################################################ Tool Collection Installs ################################################ 
 
 BrewInstall(){
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  # cd ~ && mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
-  # eval "$(homebrew/bin/brew shellenv)"
-  # brew update --force --quiet
-  # chmod -R go-w "$(brew --prefix)/share/zsh"
+	NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+	# Configure variables and add to path
+	export PATH="/home/linuxbrew/.linuxbrew/Homebrew/bin:$PATH"
+	echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.zprofile
+	eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
 }
 
 installPentestTools(){
 	if [[ -f /etc/arch-release ]]
-	then 
+	then
 		blackArchInstall
 	elif [[ -f /etc/debian_version ]]
 	then
@@ -342,22 +399,29 @@ installPentestTools(){
 		continue
 	fi
 	
-  installer ${Pentest[*]}
+	# Kali requires '-t kali-rolling' after install
+ 	for pkg in ${Pentest[*]}
+		do
+			if command -v $pkg >/dev/null 2>&1; then
+				echo -e "$info  \033[31m*\033[0m[ $pkg is Already Installed ]\033[31m*\033[0m"
+			else
+				echo -ne "$warning  \033[31m*\033[0m[ $pkg is Not Installed (Attempting to Install..) ]\033[31m*\033[0m\n"
+				eval "$manager $pkg -t kali-rolling"
+				echo -ne "$success  \033[31m*\033[0m[ $pkg is Complete ]\033[31m>33[31m*\033[0m\n"
+			# if [[ $? -ne 1 ]]; then echo -ne "$failure  \033[31m*\033[0m[ $pkg Failed to Install ]\033[31m*\033[0m\n"; else echo -ne "$success  \033[31m*\033[0m[ $pkg is Complete ]\033[31m*\033[0m\n"; fi
+			fi
+		done
 	
 	optTools
         
-  [ ! -d "/usr/share/seclist" ] && installer seclists
-        
-  curl -sSL https://bootstrap.pypa.io/get-pip.py | python3
-  python3 -m pip install --user pipx
-	
+	[ ! -d "/usr/share/seclist" ] && installer seclists
+		
 	for i in ${pipxPrograms[*]}; do eval "pipx install $i"; done
         
-  BrewInstall
-        
-	local manager="brew install"
+	local manager="brew install "
 
-  installer ${BrewTools[*]}
+	installer ${BrewToolsPentest[*]}
+	installer ${BrewToolsNetwork[*]}
 	
 	LocalGTFO
 	
@@ -373,9 +437,28 @@ installBasic(){
 	
 	Neovim
 	
-  InstallWallpaper
+	InstallWallpaper
 	
+  if [[ -f /etc/debian_version ]]
+  then 
+    Obsidian-Snap
+    Powershell-Ubuntu
+    Sublime-Text-Ubuntu
+  fi
+
+	Docker
+
+	BrewInstall
+        
+	local manager="brew install "
+
+	installer ${BrewTools[*]}
+
 	if [[ -f /etc/arch-release ]]; then configureArch; fi
+	
+	# install pip
+	curl -sSL https://bootstrap.pypa.io/get-pip.py | python3
+	python3 -m pip install --user pipx
 	
 }
 
