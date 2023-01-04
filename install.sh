@@ -36,10 +36,8 @@ DOTfolder=$(find / -name DOTconf -type d 2> /dev/null | sed -n '1p')
 # - burp
 # - Gnome extension: check top gnome extesntions, probably system monitor, clipboard, IPs, desktops, dash to dock,  
 # - ZSH Theme concept: https://github.com/ohmyzsh/ohmyzsh/wiki/Themes#jonathan & https://github.com/ohmyzsh/ohmyzsh/wiki/Themes#xiong-chiamiov-plus
-# - download flare-floss executable from https://github.com/mandiant/flare-floss/releases/tag/v2.0.0, put in /opt and link to /usr/bin or something
 # - ubuntu config export for gnome, this is not the same as arch
 # - increase speed of .zsh loading
-# - Add rotten potato and juicy potato ng from (https://github.com/antonioCoco/JuicyPotatoNG) and Print nighttmare (https://github.com/calebstewart/CVE-2021-1675)
 # - kali requires '-t kali-rolling' after apt command with this setup, add 'kali-get' to zshrc file
 # - add networking tools install
 # - obsidian link is correct but links to 404 due to %0D contained in Version variable
@@ -183,16 +181,26 @@ ConfigureGnome(){
 	git clone https://github.com/EliverLara/candy-icons.git /usr/share/icons/candy-icons
 	gsettings set org.gnome.desktop.interface icon-theme candy-icons
 
-	#load backup (for arch)
-	dconf load / < $DOTfolder/dconf-backup
+  if [[ -f /etc/arch-release ]]
+  then
+    #load backup (for arch)
+    dconf load / < $DOTfolder/dconf-backup
+  elif [[ -f /etc/debian_version ]]
+  then 
+    # load conf for ubuntu
+    mv $HOME/.config/dconf/user $HOME/.config/dconf/user.bak 
+    ln -s $DOTfolder/dconf-backup $HOME/.config/dconf/user
+  else
+    exit 1
+  fi
 
 	# night mode on
-	gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
-	# Automatic night light schedule
-	gsettings set org.gnome.settings-daemon.plugins.color night-light-schedule-automatic true
-	#set dark theme
-	gsettings set org.gnome.desktop.interface color-scheme prefer-dark | gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
-
+	# gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
+	# # Automatic night light schedule
+	# gsettings set org.gnome.settings-daemon.plugins.color night-light-schedule-automatic true
+	# #set dark theme
+	# gsettings set org.gnome.desktop.interface color-scheme prefer-dark | gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+  #
 	# Disable all gnome extensions
 	#for ext in $(/usr/bin/ls ~/.local/share/gnome-shell/extensions); do 
 	#  gnome-extensions disable $ext
@@ -325,6 +333,9 @@ optTools(){
 	sudo curl -sL --create-dirs -o /opt/SeImpersonatePrivilege/PrintSpoofer/PrintSpoofer64.exe ttps://github.com/itm4n/PrintSpoofer/releases/download/v1.0/PrintSpoofer64.exe
 	sudo curl -sL --create-dirs -o /opt/SeImpersonatePrivilege/PrintSpoofer/README.md https://raw.githubusercontent.com/itm4n/PrintSpoofer/master/README.md
 
+  sudo curl -sL --create-dirs -o /opt/SeImpersonatePrivilege/JuicyPotatoNG/JuicyPotatoNG.zip https://github.com/antonioCoco/JuicyPotatoNG/releases/download/v1.1/JuicyPotatoNG.zip
+
+  sudo git clone https://github.com/calebstewart/CVE-2021-1675.git /opt/SeImpersonatePrivilege/PrintNightmare
 	# Responder install 
 	sudo git clone https://github.com/lgandx/Responder /opt/Responder && sudo ln -s /opt/Responder/responder.py /usr/local/bin/responder 
 	sudo chmod +x /usr/local/bin/responder 
@@ -429,6 +440,8 @@ installPentestTools(){
 }
 
 installBasic(){
+	if [[ -f /etc/arch-release ]]; then configureArch; fi
+	
 	installer ${programsAll[*]}
 	
 	Installzsh
@@ -454,8 +467,8 @@ installBasic(){
 
 	installer ${BrewTools[*]}
 
-	if [[ -f /etc/arch-release ]]; then configureArch; fi
-	
+  ConfigureNavi
+
 	# install pip
 	curl -sSL https://bootstrap.pypa.io/get-pip.py | python3
 	python3 -m pip install --user pipx
