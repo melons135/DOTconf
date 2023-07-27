@@ -222,7 +222,7 @@ update(){
 	for f in ${(@f)osInfo}; do if [[ -f $f ]]; then eval $osInfo[$f]; fi; done
 }
 
-export PATH="$HOME/.local/bin:/home/linuxbrew/.linuxbrew:$PATH" #$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$HOME/.cargo/bin
+export PATH="$HOME/.local/bin:/home/linuxbrew/.linuxbrew/bin:$PATH" #$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$HOME/.cargo/bin
 
 # nvai widgit
 eval "$(navi widget zsh)"

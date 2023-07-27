@@ -36,12 +36,13 @@ DOTfolder=$(find / -name DOTconf -type d 2> /dev/null | sed -n '1p')
 # - burp
 # - Gnome extension: check top gnome extesntions, probably system monitor, clipboard, IPs, desktops, dash to dock,  
 # - ZSH Theme concept: https://github.com/ohmyzsh/ohmyzsh/wiki/Themes#jonathan & https://github.com/ohmyzsh/ohmyzsh/wiki/Themes#xiong-chiamiov-plus
-# - ubuntu config export for gnome, this is not the same as arch
 # - increase speed of .zsh loading
 # - kali requires '-t kali-rolling' after apt command with this setup, add 'kali-get' to zshrc file
 # - add networking tools install
 # - obsidian link is correct but links to 404 due to %0D contained in Version variable
 # - apply version program to /opt downloads
+# - If its a laptop add https://github.com/iberianpig/fusuma and link config to DOTfolder fusuma
+# -  
 
 ################################################# General Functions #################################################
 
@@ -231,7 +232,10 @@ Neovim(){
 	installer neovim noto-fonts{,-extra,-emoji}
 	
 	# install space vim
-	curl -sLf https://spacevim.org/install.sh | bash
+	# curl -sLf https://spacevim.org/install.sh | bash
+
+  # install NvChad
+  git clone https://github.com/NvChad/NvChad $HOME/.config/nvim --depth 1 
 
   # Check installed in the correct place (this will clobber current config)
   if [[ -L $HOME/.nvim  ]]; then mv $HOME/.nvim $HOME/config/nvim; fi
@@ -367,6 +371,12 @@ optTools(){
   # Download flarefloss
   GetLatestsGit mandiant/flare-floss
   sudo curl -sL --create-dirs -o /opt/Floss https://github.com/mandiant/flare-floss/releases/download/$Latest/floss-$Latest-linux.zip && sudo ln -s /opt/Floss /usr/local/bin/floss
+
+  # Download CyberChef
+  GetLatestsGit gchq/CyberChef
+  sudo wget https://github.com/gchq/CyberChef/releases/tag/CyberChef_$latest.zip /opt/CyberChef
+  sudo unzip /opt/CyberChef/CyberChef_$latest -d /opt/CyberChef
+  sudo rm -f /opt/CyberChef/CyberChef_$latest
 }
 
 # InstallZeek(){
@@ -466,6 +476,8 @@ installBasic(){
 	local manager="brew install "
 
 	installer ${BrewTools[*]}
+
+  if [ -d $HOME/.config/nvim/NvChad ]; then installer npm; fi
 
   ConfigureNavi
 
