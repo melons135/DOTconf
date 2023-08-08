@@ -1,0 +1,98 @@
+{
+  "policies": {
+    "ExtensionSettings": {
+      "uBlock0@raymondhill.net": {
+        "installation_mode": "normal_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi"
+      },
+      "foxyproxy@eric.h.jung": {
+        "installation_mode": "normal_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/foxyproxy-standard/latest.xpi"
+      },
+      "user-agent-switcher@ninetailed.ninja": {
+        "installation_mode": "normal_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/uaswitcher/latest.xpi"
+      },
+      "{ed102056-8b4f-43a9-99cd-6d1b25abe87e}": {
+        "installation_mode": "normal_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/http-header-live/latest.xpi"
+      },
+      "{f1423c11-a4e2-4709-a0f8-6d6a68c83d08}": {
+        "installation_mode": "normal_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/hacktools/latest.xpi"
+      }
+    },
+    "ExtensionUpdate": true,
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "EnableTrackingProtection": {
+      "Value": true,
+      "Locked": false,
+      "Cryptomining": true,
+      "Fingerprinting": true,
+      "EmailTracking": true,
+      "Exceptions": []
+    },
+    "DisablePocket": true,
+    "ManagedBookmarks": [
+      {
+        "name": "Labs",
+        "children": [
+          {
+            "url": "https://tryhackme.com/dashboard",
+            "name": "TryHackMe"
+          },
+          {
+            "url": "https://app.hackthebox.com/home",
+            "name": "HackTheBox"
+          },
+          {
+            "url": "https://portal.offsec.com/library/all",
+            "name": "OffSec"
+          },
+          {
+            "url": "https://www.vulnlab.com/",
+            "name": "VulnLab"
+          },
+          {
+            "url": "https://overthewire.org/wargames/",
+            "name": "OverTheWire"
+          },
+          {
+            "url": "https://underthewire.tech/wargames",
+            "name": "UnderTheWire"
+          }
+        ]
+      },
+      {
+        "url": "https://lolol.farm/",
+        "name": "LOLOL"
+      },
+      {
+        "url": "https://gchq.github.io/CyberChef/",
+        "name": "CyberChef"
+      },
+      {
+        "url": "https://jsoncrack.com/editor/",
+        "name": "JSONCrack"
+      },
+      {
+        "url": "https://crackstation.net/",
+        "name": "CrackStation"
+      },
+      {
+        "url": "https://hijacklibs.net/",
+        "name": "HijackLibs"
+      },
+      {
+        "url": "https://github.com/wietze/windows-dll-hijacking",
+        "name": "Windows DLL Hijacking"
+      }
+    ],
+    "AppAutoUpdate": true,
+    "Homepage": {
+      "URL": "https://www.google.com/",
+      "StartPage": "previous-session"
+    }
+  }
+}
