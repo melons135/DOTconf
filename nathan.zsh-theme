@@ -8,7 +8,7 @@ function theme_precmd {
   # %m = The hostname up to the first ‘.’
   # %l = The line (tty) the user is logged in on
 
-  local promptsize=${#${(%):--(%n)--{}--()}}
+  local promptsize=${#${(%):--(%n)--{}--[]}}
   local rubypromptsize=${#${(%)$(ruby_prompt_info)}}
   # ${(%):-%~} = currenlt working directory with ~ instead of $HOME
   local pwdsize=${#${(%):-%~}}
@@ -41,10 +41,10 @@ add-zsh-hook preexec theme_preexec
 if [[ -d /sys/class/net/tun0 ]]
 then
   # print tun0 ip and netmask
-  PROMPTIP=$(ip a show tun0 | grep 'inet ' | awk '{ sub(/.*inet /,""); sub(/ .*/, ""); printf; print ":tun0" }')
+  PROMPTIP=$(ip -c=never a show tun0 | grep 'inet ' | awk '{ sub(/.*inet /,""); sub(/ .*/, ""); printf $1":tun0" }')
 else
   # print ip for outbound connections
-  PROMPTIP=$(ip route get 8.8.8.8 2>/dev/null | awk 'NR==1{ sub(/.*dev /,""); sub(/ uid.*/, ""); printf $3":"; print $1 }')
+  PROMPTIP=$(ip -c=never route get 8.8.8.8 2>/dev/null | awk 'NR==1{ sub(/.*dev /,""); sub(/ uid.*/, ""); printf $3":"$1}')
 fi
 
 # Set the prompt
