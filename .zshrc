@@ -1,7 +1,7 @@
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-source ~/zsh-defer/zsh-defer.plugin.zsh
+source $ZSH/plugins/zsh-defer/zsh-defer.plugin.zsh
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -100,7 +100,7 @@ neofetch 2>/dev/null
 # export MYIP=$(ip addr show tun0 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' --color=none)
 
 # Load Aliases and Fuctions
-zsh-defer source ~/Documents/AnFs.zsh
+zsh-defer source $ZSH/AnFs.zsh
 
 # User the follwing with `zprof` to figure out what is taking so long to load
 # when starting terminal. For speeding up your shell, the information that matters the most is the self/percent column
