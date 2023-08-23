@@ -35,6 +35,9 @@ alias listening='ss -nlt'
 #colour commands
 alias ip="ip -c"
 
+#list all IPs breif
+alias ips="ip -c=never -brie a"
+
 # docker here
 alias dockerit='sudo docker run -it --rm -v $PWD/$2:/ $2'
 
