@@ -133,9 +133,11 @@ update(){
 
 websploit(){
 	if ! test -f /usr/share/Websploit/docker-compose.yml; then
+		echo "getting docker-compose.yml from WebSploit.org"
 		mkdir -p /usr/share/Websploit && wget -O /usr/share/Websploit/docker-compose.yml https://websploit.org/docker-compose.yml
 	fi
 	# exit early on non 0 status
+	echo "Setting up the containers and internal bridge network"
 	(set -e
 	docker-compose -f /usr/share/Websploit/docker-compose.yml up -d
 	clear
