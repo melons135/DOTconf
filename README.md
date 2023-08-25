@@ -8,8 +8,8 @@ Configuration files and setup scripts for Linux systems
 ## Neofetch ASCII Art
 ```
      ^    
-  __/=\__ …
-   /•¸•\-(¤)-
+  __/=\__ .
+   /•¸•\‹(¤)›
   _\_˜_/ '|'
  / ` V `\<`)
  \ ( . |\_/
