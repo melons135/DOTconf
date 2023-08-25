@@ -11,7 +11,7 @@ Configuration files and setup scripts for Linux systems
   __/=\__ …
    /•¸•\-(¤)-
   _\_˜_/ '|'
- /  \./`\<`)
+ / ` V `\<`)
  \ ( . |\_/
  /)_). (  |
 /_/_____\.†.
