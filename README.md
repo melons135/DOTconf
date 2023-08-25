@@ -6,6 +6,7 @@ Configuration files and setup scripts for Linux systems
 - folder called DOTconf
 
 ## Neofetch ASCII Art
+```
     ^ 
  __/=\__ .
   /•¸•\-(¤)-
@@ -14,3 +15,4 @@ Configuration files and setup scripts for Linux systems
 \ ( . |\_/
 /)) . (  |
 / / .  \.'.
+```
