@@ -14,5 +14,5 @@ Configuration files and setup scripts for Linux systems
  /  \./`\<`)
  \ ( . |\_/
  /)) . (  |
-/_/____\.'.
+/_/_____\.'.
 ```
